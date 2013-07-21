@@ -28,3 +28,9 @@
 .marketing p + h4 {
   margin-top: 28px;
 }
+
+.avatar {
+  border-radius: 60%;
+  -moz-border-radius: 60%;
+  -webkit-border-radius: 60%;
+}

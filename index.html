@@ -4,25 +4,36 @@ title: Codehacks
 ---
 
 <div class="jumbotron">
-	<h3>Hello, my name is Richard Nyström.</h3>
   <p class="lead"><strong>I’m a Ruby & Java Developer from Karlstad, Sweden.</strong></p>
 </div>
 <hr>
 
 <div class="row-fluid">
+	
 	<div class="span5">
-  	<h3>Articles</h3>
+  	<h4>Articles</h4>
   	<ul class="posts">
     	{% for post in site.posts %}
-      	<li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+      	<li><p>{{ post.date | date_to_string }} &raquo; <a href="{{ post.url }}">{{ post.title }}</a></p></li>
     	{% endfor %}
   	</ul>
   </div>
 
   <div class="span4 pull-right">
-  	<h3>Contact me</h3>
+  	<h4>Contact me</h4>
   	<h6><a href="https://github.com/ricn">Github</a></h6>
-  	<h6><a href="https://twitter.com/richardnystrom"><span class="fui-twitter"></span> Twitter</a></h6>
+  	<h6><a href="https://twitter.com/richardnystrom">Twitter</a></h6>
   	<h6><a href="#">E-mail</a></h6>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span5">
+  	<h4>Open source projects</h4>
+  	<ul class="posts">
+    	{% for post in site.posts %}
+      	<li><p>{{ post.date | date_to_string }} &raquo; <a href="{{ post.url }}">{{ post.title }}</a></p></li>
+    	{% endfor %}
+  	</ul>
   </div>
 </div>
