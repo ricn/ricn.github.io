@@ -34,3 +34,7 @@
   -moz-border-radius: 60%;
   -webkit-border-radius: 60%;
 }
+
+ul {
+  list-style-type: none;  
+}
