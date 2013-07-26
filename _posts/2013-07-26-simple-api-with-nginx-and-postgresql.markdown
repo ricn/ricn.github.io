@@ -37,7 +37,7 @@ For this blog post I used PostgreSQL 9.2. You can install PostgreSQL from [Homeb
 
 #### Create the database
 {% highlight sql %}
-CREATE DATABASE articledb WITH OWNER ricn ENCODING 'UTF8';
+CREATE DATABASE articledb WITH OWNER username ENCODING 'UTF8';
 
 CREATE TABLE articles (
 	id serial PRIMARY KEY,
