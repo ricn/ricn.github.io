@@ -8,6 +8,10 @@ categories: nginx postgresql
 	How to build a simple REST API using only Nginx and PostgreSQL.
 </p>
 
+**Update:**
+
+_Many of you have been concered about SQL injection in this example. I was thinking about to add sql injection protection in the example but I chose not to to keep it simple. But when I think about it was a bad move. So I have updated the example to include protection against SQL injection._
+
 Sometimes it's overkill to use a web framework if you only need to develop a very simple REST API. It turns out that Nginx can be used to develop a full fledged REST API and PostgreSQL can easily be used for persistence.
 
 In this blog post I'm going to show you how to create a simple CRUD API for articles.
@@ -72,27 +76,27 @@ http {
       rds_json on;
       postgres_query    HEAD GET  "SELECT * FROM articles";
       
-      set $title $arg_title;
-      set $body  $arg_body;
+      postgres_escape $title $arg_title;
+      postgres_escape $body  $arg_body;
       postgres_query
-        POST "INSERT INTO articles (title, body) VALUES('$title', '$body') RETURNING *";
+        POST "INSERT INTO articles (title, body) VALUES($title, $body) RETURNING *";
       postgres_rewrite  POST changes 201;
     }
 
     location ~ /articles/(?<id>\d+) {
       postgres_pass database;
       rds_json  on;
-
-      postgres_query    HEAD GET  "SELECT * FROM articles WHERE id='$id'";
+      postgres_escape $escaped_id $id;
+      postgres_query    HEAD GET  "SELECT * FROM articles WHERE id=$escaped_id";
       postgres_rewrite  HEAD GET  no_rows 410;
 
-      set $title $arg_title;
-      set $body  $arg_body;
+      postgres_escape $title $arg_title;
+      postgres_escape $body  $arg_body;
       postgres_query
-        PUT "UPDATE articles SET title='$title', body='$body' WHERE id='$id' RETURNING *";
+        PUT "UPDATE articles SET title=$title, body=$body WHERE id=$escaped_id RETURNING *";
       postgres_rewrite  PUT no_changes 410;
 
-      postgres_query    DELETE  "DELETE FROM articles WHERE id='$id'";
+      postgres_query    DELETE  "DELETE FROM articles WHERE id=$escaped_id";
       postgres_rewrite  DELETE  no_changes 410;
       postgres_rewrite  DELETE  changes 204;
     }
