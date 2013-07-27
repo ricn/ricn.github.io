@@ -56,7 +56,7 @@ class CreateDocuments < ActiveRecord::Migration
 end
 {% endhighlight %}
 
-Note that we have explicitly changed the id to be a uuid type.
+Note that we have explicitly changed the id to be of type uuid.
 
 Now you're ready to create the database and run the migrations:
 {% highlight bash %}
@@ -74,7 +74,7 @@ irb(main):011:0> Document.create(title: "PostgreSQL rocks!", author: "Richard N"
 As you can see, your model now uses a UUID as a primary key instead of a simple integer. 
 
 #### Gotchas
-One thing that's not going to work anymore when you switch to UUIDs is the Document.first and Document.last class methods. To make them work again you can use the created_at attribute and define your own scopes in your model:
+One thing that's not going to work anymore when you switch to UUIDs is the `Document.first` and `Document.last` class methods. To make them work again you can use the `created_at` attribute and define your own scopes in your model:
 
 {% highlight ruby %}
 class Document < ActiveRecord::Base
