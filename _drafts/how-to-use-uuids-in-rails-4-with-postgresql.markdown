@@ -5,17 +5,16 @@ date:   2013-07-27 21:00:00
 categories: rails postgresql
 ---
 <p class="lead">
-	Why and how you should use UUIDs as Primary keys in Rails 4 with PostgreSQL
+	How to use UUIDs as Primary keys in Rails 4 with PostgreSQL
 </p>
 
-##### What are UUIDs anyway and why should I use them?
+##### What are UUIDs anyway and why should you use them?
 
-UUID stands for Universally Unique Identifier and the original purpose of UUIDs was to enable distributed systems to uniquely identify objects without significant central coordination. Anyone can create a UUIDs and use them to identify something with reasonable confidence that the same identifier will never be unintentionally created by anyone to identify some other kind of object. 
+UUID stands for Universally Unique Identifier and the original purpose of UUIDs was to enable distributed systems to uniquely identify objects without significant central coordination. Anyone can create UUIDs and use them to identify something with reasonable confidence that the same identifier will never be unintentionally created by anyone to identify some other kind of object. 
 
-Objects created with UUIDs can therefore be later combined into a single database without needing to resolve identifier conflicts. 
+Objects created with UUIDs can therefore later be merged into a single database without needing to resolve conflicts. 
 
-Another advantage has to do with the randomness of those UUIDs. By not having your UUIDs follow any pattern, it's impossible for potential attackers to be able to go through your database records without you giving them a list of primary UUIDs. Of course, this doesn't automatically make your application secure, but it reduces the damage that is likely to be done if a security bug is exploited.
-
+Another advantage has to do with the randomness of UUIDs. UUIDs will not follow any kind of pattern so it's impossible for potential attackers to be able to go through your database records without you exposing a list of UUIDs. Of course, this doesn't automatically make your application secure, but it can reduce the damage that is likely to be done if a security bug is exploited.
 
 ##### Setup
 
@@ -57,7 +56,7 @@ class CreateDocuments < ActiveRecord::Migration
 end
 {% endhighlight %}
 
-Note that we have explicitly changed the id to be of type uuid.
+Note that we have explicitly changed the id to be a uuid type.
 
 Now you're ready to create the database and run the migrations:
 {% highlight bash %}
@@ -72,7 +71,18 @@ rails c
 irb(main):011:0> Document.create(title: "PostgreSQL rocks!", author: "Richard N")
 => #<Document id: "33332e5a-dc83-48c9-ad92-28a99095b47b", title: "PostgreSQL rocks!", author: "Richard N", created_at: "2013-07-27 21:02:17", updated_at: "2013-07-27 21:02:17">
 {% endhighlight %}
-Your model now uses a UUID as a primary key instead of a simple integer. 
+As you can see, your model now uses a UUID as a primary key instead of a simple integer. 
 
-#### Things to consider
-One thing in Rails that's not going to work anymore when you switch to UUIDs is the Document.first and Document.last class methods. 
+#### Gotchas
+One thing that's not going to work anymore when you switch to UUIDs is the Document.first and Document.last class methods. To make them work again you can use the created_at attribute and define your own scopes in your model:
+
+{% highlight ruby %}
+class Document < ActiveRecord::Base
+  scope :first, -> { order("created_at").first }
+  scope :last, -> { order("created_at DESC").first }
+end
+{% endhighlight %}
+
+Another thing that's not going to work anymore is the `t.references` method in migrations. If you write `t.references :document` for another table you create, it will create a `document_id` column with an `integer` as the type. This is not going to work because of obvious reasons. Instead you should define your relations using `t.uuid :document_id`.
+
+Using UUIDs as primary keys has some drawbacks. They can be a little bit slower to generate and they requires bigger indexes compared to normal auto increment primary keys so you should consider that before using them.
