@@ -34,7 +34,7 @@ class CreateDocuments < ActiveRecord::Migration
 end
 {% endhighlight %}
 
-Note that we have added the `array: true` option to the tags attribute and that it defaults to an empty array `{}`
+Note that we have added the `array: true` option to the tags attribute and that it defaults to an empty array.
 
 Now you're ready to create the database and run the migrations:
 {% highlight bash %}
