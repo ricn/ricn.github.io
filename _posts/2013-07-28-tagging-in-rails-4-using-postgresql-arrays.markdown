@@ -27,7 +27,7 @@ class CreateDocuments < ActiveRecord::Migration
   def change
     create_table :documents do |t|
       t.string :title
-      t.string :tags, array: true, default: {}
+      t.string :tags, array: true, default: []
       t.timestamps
     end
   end
