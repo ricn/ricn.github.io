@@ -2,3 +2,7 @@ _site
 notes
 
 .DS_Store
+
+_posts/.DS_Store
+
+.DS_Store
