@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Custom fields in Rails using PostgreSQL"
-date:   2013-08-03 20:00:00
+date:   2013-08-03 22:22:22
 categories: rails postgresql
 ---
 
