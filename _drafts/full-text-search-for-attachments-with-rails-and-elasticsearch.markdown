@@ -56,7 +56,8 @@ The [Carrierwave gem](https://github.com/carrierwaveuploader/carrierwave) is use
 
 #### Create the ActiveRecord model
 {% highlight ruby %}
-rails generate model document title:string attachment:string
+rails generate model document title:string document_attachment:string
+rake db:migrate
 
 # this should give you this file app/uploaders/document_attachment_uploader.rb:
 rails generate uploader DocumentAttachment
@@ -80,5 +81,32 @@ We can leave the DocumentAttachment class as is. This version will store files d
 
 Now is the time to setup the uploader and integrate our Document model with Elasticsearch:
 {% highlight ruby %}
+class Document < ActiveRecord::Base
+  # We're mounting the uploader the document_attachment attribute.
+  # This attribute will store the path to the attachment.
+  mount_uploader :document_attachment, DocumentAttachmentUploader
+	
+  # Setting up ElasticSearch integration
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+	
+  mapping _source: { excludes: ['attachment'] } do
+    indexes :id, type: 'integer'
+    indexes :title
+    indexes :attachment, type: 'attachment'
+  end
 
+  def attachment
+    path_to_attachment = document_attachment.file.file
+    Base64.encode64(open(path_to_attachment) { |file| file.read })
+  end
+
+  def to_indexed_json
+    to_json(methods: [:attachment])
+  end
+end
 {% endhighlight %}
+
+The first thing we do in the model is to mount the uploader with the document_attachment attribute. After that we include Tire to make the integration with ElasticSearch work. After that we setup a mapping block which describes what and how we should index and store our data in ElasticSearch. Note that we exclude that attachment in the beginning of the block. We do this because we don't want to store the actual content of the file in the index because that will make your index grow very fast. However, this doesn't mean the content won't be indexed. The other lines in the block just specifices what we want to index and what type they should be. The attachment type is not available in ElasticSearch by default but we got it by installing the attachment type plugin.
+
+Next we have defined a attachment method. ElastichSearch requires that we send the file content as a Base64 encoded string so the method fixes that. After that we have specified a method that returns the actual json that will be posted to ElasticSearch and we have specified that the result of the attachment method should be included.
