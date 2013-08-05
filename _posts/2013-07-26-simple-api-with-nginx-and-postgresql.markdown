@@ -8,10 +8,6 @@ categories: nginx postgresql
 	How to build a simple REST API using only Nginx and PostgreSQL.
 </p>
 
-**Update:**
-
-_Many of you have been concerned about SQL injection in this example. I was thinking about to add sql injection protection in the example but I chose not to to keep it simple. But when I think about it was a bad move. So I have updated the example to include protection against SQL injection._
-
 Sometimes it's overkill to use a web framework if you only need to develop a very simple REST API. It turns out that Nginx can be used to develop a full fledged REST API and PostgreSQL can easily be used for persistence.
 
 In this blog post I'm going to show you how to create a simple CRUD API for articles.
