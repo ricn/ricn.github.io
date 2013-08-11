@@ -5,7 +5,7 @@ date:   2013-08-11 00:00:00
 categories: ruby shell
 ---
 
-I use the cat command in the terminal every single day to take a peek at source code. When you look at source code in terminal you probably want it to be syntax highlighted. In this article I'm going to show how you can do it using the excellent [coderay](https://github.com/rubychan/coderay).
+I use the cat command in the terminal every single day to take a peek at source code. When you look at source code in terminal you probably want it to be syntax highlighted. In this article I'm going to show how you can do it using the excellent [coderay](https://github.com/rubychan/coderay) gem.
 
 This is how I did on my Mac:
 
