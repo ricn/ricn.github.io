@@ -38,11 +38,11 @@ indexes_development=# \d products
 Indexes:
     "products_pkey" PRIMARY KEY, btree (id)
 {% endhighlight %}
+
 As you can see, you now have an primary key index using the btree type to index the id column.
 
-#### Foreign key indexes
-
-Always add index for foreign key, columns that need to be sorted, lookup fields and columns that are used in a GROUP BY. This can improve the performance for sql query.
+#### Foreign key and other commonly used columns
+Unlike primary keys, foreign keys and other columns in your table will not be indexed automatically in Rails. So it's always a good idea to add indexes for foreign keys, columns that need to be sorted, lookup fields and columns that are used with the `group` method (GROUP BY) in the Active Record Query Interface. This can improve the performance for sql query.
 
 #### Unique Indexes
 
