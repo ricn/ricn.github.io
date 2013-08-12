@@ -9,7 +9,7 @@ categories: rails postgresql
 </p>
 
 Reading about indexing can be a little bit boring but the truth is that to create a snappy Rails application you need to create effective indexes for your database.
-PostgreSQL has many types of options when it comes to indexing. The one we're going to focus on in this article is the B-tree index type which is the most commonly used index type for most use cases.
+PostgreSQL has many types of options when it comes to indexing. The one we're going to focus on in this article is the [B-tree](http://en.wikipedia.org/wiki/B-tree) index type which is the most commonly used index type for most use cases.
 
 #### Primary key indexes
 
@@ -87,13 +87,36 @@ Notice that we now have an index called `index_products_on_category_id` for the 
 
 If you create a unique index for a column it means you're guaranteed the table won't have more than one row with the same value for that column. Using only `validates_uniqueness_of` validation in your model isn't enough to enforce uniqueness because there can be concurrent users trying to create the same data.
 
-Imagine that two users tries to register an account with the same username where you have set `validates_uniqueness_of :username` in your user model. If they hit the "Sign up" button at the same time Rails will look in the user table for that username and respond back that everything is fine and that it's ok to save the record to the table. Rails will then save the two records to the user table with the same username and you now have a really shitty problem to deal with.
+Imagine that two users tries to register an account with the same username where you have set `validates_uniqueness_of :username` in your user model. If they hit the "Sign up" button at the same time Rails will look in the user table for that username and respond back that everything is fine and that it's ok to save the record to the table. Rails will then save the two records to the user table with the same username and now you have a really shitty problem to deal with.
 
 To avoid this you need to create a unique constraint at the database level as well. Typical columns that should have unique indexes are username or e-mail for logins:
+{% highlight ruby %}
+class CreateUsers < ActiveRecord::Migration
+  def change
+    create_table :users do |t|
+      t.string :username
+      ...
+    end
+    
+    add_index :users, :username, unique: true
+  end
+end
+{% endhighlight %}
 
+In psql:
+{% highlight sql %}
+indexes_development=# \d users
+                                  Table "public.users"
+  Column  |          Type          |                     Modifiers
+----------+------------------------+----------------------------------------------------
+ id       | integer                | not null default nextval('users_id_seq'::regclass)
+ username | character varying(255) | 
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (id)
+    "index_users_on_username" UNIQUE, btree (username)
+{% endhighlight %}
 
-
-So by using this kind of index you get two very nice benefits. Data integrity as descibed above and you also get good performance because unique indexes tends to be very fast.
+So by creating the `index_users_on_username` unique index you get two very nice benefits. Data integrity as descibed above and you also get good performance because unique indexes tends to be very fast.
 
 #### Sorted Indexes
 By default, the entries in a B-tree index is sorted in ascending order.
