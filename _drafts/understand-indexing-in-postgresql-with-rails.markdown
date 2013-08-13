@@ -116,7 +116,7 @@ Indexes:
     "index_users_on_username" UNIQUE, btree (username)
 {% endhighlight %}
 
-So by creating the `index_users_on_username` unique index you get two very nice benefits. Data integrity as descibed above and you also get good performance because unique indexes tends to be very fast.
+So by creating the `index_users_on_username` unique index you get two very nice benefits. Data integrity as descibed above and good performance because unique indexes tends to be very fast.
 
 #### Sorted Indexes
 By default, the entries in a B-tree index is sorted in ascending order.
