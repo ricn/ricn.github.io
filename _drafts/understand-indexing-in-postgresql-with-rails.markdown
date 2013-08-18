@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "PostgreSQL indexing in Rails"
-date:   2013-08-12 21:00:00
+date:   2013-08-19 18:00:00
 categories: rails postgresql
 ---
 <p class="lead">
@@ -119,23 +119,49 @@ Indexes:
 So by creating the `index_users_on_username` unique index you get two very nice benefits. Data integrity as descibed above and good performance because unique indexes tends to be very fast.
 
 #### Sorted Indexes
-By default, the entries in a B-tree index is sorted in ascending order.
 
-In some cases it makes sense to supply a different sort order for an index. Take the case when you’re showing a paginated list of articles, sorted by most recent published first. We may have a published_at column on our articles table. For unpublished articles, the published_at value is NULL.
+By default, the entries in a B-tree index is sorted in ascending order. However, in some particular cases it can be a good idea to use a descending order for the index instead.
 
+One of the most obvious is then you have something that is paginated and all the items is sorted by the most recent published first. For example a blog post model that has a released_at column. For unreleased blog posts, the released_at value is NULL.
 
-In this case we can create an index like so:
+This is how you create this kind of index:
 
-Since we will be querying the table in sorted order by published_at and limiting the result, we may get some benefit out of creating an index in the same order. Postgres will find the rows it needs from the index in the correct order, and then go to the data blocks to retrieve the data. If the index wasn’t sorted, there’s a good chance that Postgres would read the data blocks sequentially and sort the results.
+{% highlight ruby %}
+class CreatePosts < ActiveRecord::Migration
+  def change
+    create_table :posts do |t|
+      t.string :title
+      t.datetime :released_at
 
-This technique is mostly relevant with single column indexes when you require “nulls to sort last” behavior, because otherwise the order is already available since an index can be scanned in any direction. It becomes even more relevant when used against a multi-column index when a query requests a mixed sort order, like a ASC, b DESC.
+      t.timestamps
+    end
 
-#### Multi-column Indexes
+    add_index :posts, :released_at, order: { released_at: "DESC NULLS LAST" }
+  end
+end
+{% endhighlight %}
 
-While Postgres has the ability to create multi-column indexes, it’s important to understand when it makes sense to do so. The Postgres query planner has the ability to combine and use multiple single-column indexes in a multi-column query by performing a bitmap index scan. In general, you can create an index on every column that covers query conditions and in most cases Postgres will use them, so make sure to benchmark and justify the creation of a multi-column index before you create them. As always, indexes come with a cost, and multi-column indexes can only optimize the queries that reference the columns in the index in the same order, while multiple single column indexes provide performance improvements to a larger number of queries.
+As we're going to query the table in sorted order by released_at and limiting the result, we may gem some benefit by creating an index in that order.
+PostgreSQL will find the rows it needs from the index in the correct order, and then go to the data blocks to retrieve the data. If the index wasn’t sorted, there’s a good chance that PostgreSQL would read the data blocks sequentially and sort the results.
 
-However there are cases where a multi-column index clearly makes sense. An index on columns (a, b) can be used by queries containing WHERE a = x AND b = y, or queries using WHERE a = x only, but will not be used by a query using WHERE b = y. So if this matches the query patterns of your application, the multi-column index approach is worth considering. Also note that in this case creating an index on a alone would be redundant.
+This technique is mostly relevant with single column indexes when you require “nulls to sort last” behavior, because otherwise the order is already available since an index can be scanned in any direction.
 
 #### Partial Indexes
 
-#### Expression Indexes
+If you frequently filter your queries by a particular characteristic, and that characteristic is present in a minority of your rows, partial indexes may be a big win.  It is basically an index using a WHERE clause. It increases the efficiency of the index by reducing its size which makes the index smaller and takes less storage, is easier to maintain, and is faster to scan.
+
+For example, suppose you allow users to flag projects in your application, which in turn sets the active boolean to true. You then process active projects in batches. You may want to create an index like so:
+
+Example:
+{% highlight ruby %}
+{% endhighlight %}
+
+#### Functional Indexes
+
+On some of our tables, we need to index strings (for example, 64 character base64 tokens) that are quite long, and creating an index on those strings ends up duplicating a lot of data. For these, Postgres’ functional index feature can be very helpful:
+
+{% highlight ruby %}
+CREATE INDEX CONCURRENTLY on tokens (substr(token), 0, 8)
+{% endhighlight %}
+
+While there will be multiple rows that match that prefix, having Postgres match those prefixes and then filter down is quick, and the resulting index was 1/10th the size it would have been had we indexed the entire string.
