@@ -148,9 +148,9 @@ This technique is mostly relevant with single column indexes when you require â€
 
 #### Partial Indexes
 
-If you frequently filter your queries by a particular characteristic, and that characteristic is present in a minority of your rows, partial indexes may be a big win.  It is basically an index using a WHERE clause. It increases the efficiency of the index by reducing its size which makes the index smaller and takes less storage, is easier to maintain, and is faster to scan.
+If you frequently filter your queries by a particular `flag`, and that `flag` is present in a minority of your rows, partial indexes may be a big win.  It is basically an index using a WHERE clause. It increases the efficiency of the index by reducing its size which makes the index smaller and takes less storage, is easier to maintain, and is faster to scan.
 
-For example, suppose you allow users to flag projects in your application, which in turn sets the active boolean to true. You then process active projects in batches. You may want to create an index like so:
+Let's say that you have a table for orders. That table can contain both billed and unbilled orders, where the unbilled orders take up a minority of the total rows in the table. It's very likely that the unbilled orders are also the most accesses rows in your application. Then it is very likely that your application performance will increase if you use a partial index.
 
 Example:
 {% highlight ruby %}
