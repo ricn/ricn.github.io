@@ -87,9 +87,9 @@ Notice that we now have an index called `index_products_on_category_id` for the 
 
 If you create a unique index for a column it means you're guaranteed the table won't have more than one row with the same value for that column. Using only `validates_uniqueness_of` validation in your model isn't enough to enforce uniqueness because there can be concurrent users trying to create the same data.
 
-Imagine that two users tries to register an account with the same username where you have added `validates_uniqueness_of :username` in your user model. If they hit the "Sign up" button at the same time Rails will look in the user table for that username and respond back that everything is fine and that it's ok to save the record to the table. Rails will then save the two records to the user table with the same username and now you have a really shitty problem to deal with.
+Imagine that two users tries to register an account with the same username where you have added `validates_uniqueness_of :username` in your user model. If they hit the "Sign up" button at the same time, Rails will look in the user table for that username and respond back that everything is fine and that it's ok to save the record to the table. Rails will then save the two records to the user table with the same username and now you have a really shitty problem to deal with.
 
-To avoid this you need to create a unique constraint at the database level as well. Typical columns that should have unique indexes are username or e-mail for logins:
+To avoid this you need to create a unique constraint at the database level as well:
 {% highlight ruby %}
 class CreateUsers < ActiveRecord::Migration
   def change
@@ -122,7 +122,7 @@ So by creating the `index_users_on_username` unique index you get two very nice 
 
 By default, the entries in a B-tree index is sorted in ascending order. However, in some particular cases it can be a good idea to use a descending order for the index instead.
 
-One of the most obvious case is then you have something that is paginated and all the items is sorted by the most recent released first. For example a blog post model that has a released_at column. For unreleased blog posts, the released_at value is NULL.
+One of the most obvious case is when you have something that is paginated and all the items are sorted by the most recent released first. For example a blog post model that has a released_at column. For unreleased blog posts, the released_at value is NULL.
 
 This is how you create this kind of index:
 
