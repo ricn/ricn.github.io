@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "PostgreSQL indexing in Rails"
-date:   2013-08-20 23:00:00
+date:   2013-08-20 08:00:00
 categories: rails postgresql
 ---
 <p class="lead">
