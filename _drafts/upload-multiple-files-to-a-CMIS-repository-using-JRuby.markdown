@@ -55,7 +55,14 @@ password = "admin"
 @session = CMIS::create_session(atom_url, user, password)
 {% endhighlight %}
 
-As you can see, creating a session is very simple and straightforward. You only have to specify a username, password and the URL to the CMIS endpoint. CMIS does support both Atom Pub binding and Web Services binding. However, the JRuby gem only supports the Atom Pub binding which is faster than the SOAP Web Services binding and usually it's a better choice. SOAP just sucks anyway.
+As you can see, creating a session is very simple and straightforward. You only have to specify a username, password and the URL to the CMIS endpoint. CMIS does support both Atom Pub binding and Web Services binding. However, the JRuby gem only supports the Atom Pub binding which is faster than the SOAP Web Services binding and usually it's a better choice. SOAP just sucks anyway so I wont bother implementing support for it in the CMIS gem.
 
 Most CMIS servers only provides one repository by default that you can connect to and the code above automatically connects to the first repository that it finds. This is different behavior compared to the OpenCMIS library where your need to specify a repository explicitly all the time you want to connect. I've chosen to implement this behavior to make it a little bit more convienient to work with the library. However you can specify a different repository if you want to in JRuby. You can read about it in the documentation for the CMIS gem.
 
+#### Get the Target Folder
+So now we got a session to work with. CMIS repositories is represented as a hierarchical tree of object consisting of folders and documents just lika a local file system. The example below gets the root folder of the repository and creates a new folder called `Images` in the root folder. We also stores a reference (image_folder) to the new folder so we can use it later:
+
+{% highlight ruby %}
+root = @session.root_folder
+image_folder = root.create_cmis_folder("Images")
+{% endhighlight %}
