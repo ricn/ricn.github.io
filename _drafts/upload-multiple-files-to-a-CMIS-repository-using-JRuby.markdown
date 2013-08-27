@@ -27,7 +27,7 @@ Here are a few CMIS-compliant content repositories:
 
 First off, you need to install a CMIS repository on your system. In this article I'm going to use Alfresco 4.2.c Community Edition. Instructions on how to download and install Alfresco can be found [here](http://wiki.alfresco.com/wiki/Download_and_Install_Alfresco)
 
-To begin with you need to install JRuby on your system. I'm using [rbenv](https://github.com/sstephenson/rbenv) to manage different Ruby implementations. I won't going in to the details on how to get JRuby running on your system. Just search on Google if you don't know how to setup JRuby.
+To begin with you need to install JRuby on your system. I'm using [rbenv](https://github.com/sstephenson/rbenv) to manage different Ruby implementations. I won't go in to the details on how to get JRuby running on your system. Just search on Google if you don't know how to setup JRuby.
 
 When you have a running JRuby implementation on your system you can install two gems that we need:
 
@@ -37,3 +37,25 @@ gem install rika
 {% endhighlight %}
 
 The [CMIS gem](https://github.com/ricn/cmis) is a CMIS client for JRuby. This gem uses the [Apache Chemistry OpenCMIS Java libraries](http://chemistry.apache.org/java/opencmis.html) under the hood.
+
+The [Rika gem](https://github.com/ricn/rika) is a thin JRuby wrapper for [Apache Tika](http://tika.apache.org/) to extract content and metadata from various file formats.
+
+I'm the author of both gems so if they don't work as expected for you, blame me :-)
+
+#### Create a session
+The first thing you need to do is to create a session:
+
+{% highlight ruby %}
+require 'cmis'
+require 'rika'
+
+atom_url = "http://localhost:8080/alfresco/cmisatom"
+user = "admin"
+password = "admin"
+@session = CMIS::create_session(atom_url, user, password)
+{% endhighlight %}
+
+As you can see, creating a session is very simple and straightforward. You only have to specify a username, password and the URL to the CMIS endpoint. CMIS does support both Atom Pub binding and Web Services binding. However, the JRuby gem only supports the Atom Pub binding which is faster than the SOAP Web Services binding and usually it's a better choice. SOAP just sucks anyway.
+
+Most CMIS servers only provides one repository by default that you can connect to and the code above automatically connects to the first repository that it finds. This is different behavior compared to the OpenCMIS library where your need to specify a repository explicitly all the time you want to connect. I've chosen to implement this behavior to make it a little bit more convienient to work with the library. However you can specify a different repository if you want to in JRuby. You can read about it in the documentation for the CMIS gem.
+
