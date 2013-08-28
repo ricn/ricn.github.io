@@ -8,7 +8,7 @@ categories: jruby cmis
 	How to upload multiple files to a CMIS repository using JRuby
 </p>
 
-[Jeff Potts](http://ecmarchitect.com) recently posted an [article](http://ecmarchitect.com/archives/2013/08/26/3528) that show cases how you can upload multiple files to a CMIS repository using Java. I thought it would be a nice idea to write a similar article but using JRuby instead.
+[Jeff Potts](http://ecmarchitect.com) recently posted an [article](http://ecmarchitect.com/archives/2013/08/26/3528) that showcases how you can upload multiple files to a CMIS repository using Java. I thought it would be a nice idea to write a similar article but using JRuby instead.
 
 #### What is CMIS?
 
@@ -90,7 +90,7 @@ image_folder.children.each do |child|
 end
 {% endhighlight %}
 
-First I'm just show casing another way to get an object by using the `get_object_by_path` method. Then I'm just grabbing the children from the image folder and then I print out the name of the file.
+First I'm just showcasing another way to get an object by using the `get_object_by_path` method. Then I'm just grabbing the children from the image folder and then I print out the name of the file.
 
 #### Summary
 This is just a very simple example of what you can do with the OpenCMIS library and the CMIS gem in JRuby. Please let me know if you build something more interesting with the CMIS gem!
