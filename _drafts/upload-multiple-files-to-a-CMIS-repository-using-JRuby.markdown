@@ -66,3 +66,5 @@ So now we got a session to work with. CMIS repositories is represented as a hier
 root = @session.root_folder
 image_folder = root.create_cmis_folder("Images")
 {% endhighlight %}
+
+#### Upload files
