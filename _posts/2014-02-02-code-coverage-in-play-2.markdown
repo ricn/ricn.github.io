@@ -23,7 +23,7 @@ play new codecoverage
 
 Then choose to create a simple Java application.
 
-After this you need to edit your plugins.sbt file.
+After this you need to edit your `plugins.sbt` file.
 
 project/plugins.sbt: 
 {% highlight scala %}
@@ -41,7 +41,7 @@ addSbtPlugin("de.johoop" % "jacoco4sbt" % "2.1.4")
 
 At the end you see that the Jacoco sbt plugin has been added.
 
-Then you need to configure the Jacoco plugin so it fits to Play 2. Create a file called qa.jacoco.sbt the root folder of your project:
+Then you need to configure the Jacoco plugin so it fits in Play 2. Create a file called `qa.jacoco.sbt` in the root folder of your project:
 {% highlight scala %}
 import de.johoop.jacoco4sbt._
 
