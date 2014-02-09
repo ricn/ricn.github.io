@@ -10,6 +10,10 @@ categories: java play2 amazonsqs
 
 Amazon SQS (Simple Queue Service) is a distributed queue messaging service provided by Amazon. It supports programmatic sending of messages via web service applications as a way to communicate over the Internet. SQS is intended to provide a highly scalable hosted message queue that resolves issues arising from the common producer-consumer problem or connectivity between producer and consumer.
 
+A message queue is a perfect tool to use to handle asynchronous work that you don't want to perform in a web request. For example you might have a web requests that registers a new user in your application and you want to send an welcoming e-mail to the new user. 
+
+Sending e-mail is a slow and error prone process so you don't want it to slow down your application. Instead you can just use a message queue and put a message on the queue in the web request and then let Akka do the sending of the e-mails in the background.
+
 In this article I'm going to show you how to setup and integrate Amazon SQS in [Play 2](http://http://www.playframework.com).
 
 #### Setup Amazon Web Services and SQS
@@ -67,7 +71,7 @@ aws.secret.key = "ADD-YOUR-SECRET-KEY-HERE"
 
 ## Amazon SQS configuration
 aws.sqs.url="ADD-YOUR-SQS-QUEUE-URL-HERE"
-aws.sqs.setMaxNumberOfMessages=2
+aws.sqs.maxNumberOfMessages=2
 {% endhighlight %}
 
 #### Create the SQS Plugin
@@ -140,6 +144,52 @@ To make the plugin statup when your application starts up you have to create a `
 1501:plugins.SQSPlugin
 {% endhighlight %}
 
+#### Example usage
+To demonstrate the usage of the functionality you can just use the existing Application controller in your application:
+
+{% highlight java %}
+package controllers;
+
+import java.util.List;
+import com.amazonaws.services.sqs.model.Message;
+import play.*;
+import play.mvc.*;
+import plugins.SQSPlugin;
+import views.html.*;
+
+public class Application extends Controller {
+  static Configuration config = Play.application().configuration();
+  static String QUEUE_URL = config.getString("aws.sqs.url");
+  static int MAX_MSG = config.getInt("aws.sqs.maxNumberOfMessages");
+
+  public static Result index() {
+    return ok(index.render("Your new application is ready."));
+  }
+  
+  public static Result send() {
+    SQSPlugin.sendMessage(QUEUE_URL, "Hello World!");
+    return ok("Message sent.");
+  }
+    
+  public static Result receive() {
+    String result = "";
+    List<Message> msgs = SQSPlugin.receiveMessages(QUEUE_URL, MAX_MSG);
+    for (Message msg : msgs) {
+      result = msg.getBody();
+    }
+    return ok(result);
+  }
+}
+{% endhighlight %}
+
+Then add this to your `conf/routes` file:
+
+{% highlight scala %}
+GET  /send     controllers.Application.send()
+GET  /receive  controllers.Application.receive()
+{% endhighlight %}
+
+Start the Play 2 server and point your browser at http://localhost:9000/send and then go to http://localhost:9000/receive and you should see Hello world.
 
 ##### Versions used in this article:
 
