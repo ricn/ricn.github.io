@@ -189,7 +189,7 @@ GET  /send     controllers.Application.send()
 GET  /receive  controllers.Application.receive()
 {% endhighlight %}
 
-Start the Play 2 server and point your browser at http://localhost:9000/send and then go to http://localhost:9000/receive and you should see Hello world.
+Start the Play 2 server and point your browser at [http://localhost:9000/send](http://localhost:9000/send) and then go to [http://localhost:9000/receive](http://localhost:9000/receive) and you should see Hello world.
 
 ##### Versions used in this article:
 
