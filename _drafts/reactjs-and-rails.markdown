@@ -194,16 +194,16 @@ Now we have a fully functional Rails API that we can use in in the tutorial.
 
 #### Setup React in Rails
 
-For this tutorial we are going to use the react-rails gem which installs the required
+For this tutorial we are going to use [the react-rails gem](https://github.com/reactjs/react-rails) which installs the required
 js-files needed.
 
 Open your Gemfile and add the following:
 
+{% highlight ruby %}
 gem 'react-rails'
+{% endhighlight %}
 
-Run bundle install
-
-This will install the latest stable release of the react-rails gem.
+Run `bundle install`
 
 Next, we need to create a home controller which we will wire to the root url:
 
@@ -221,11 +221,10 @@ After this we can replace the index view content for our home controller with th
 
 {% highlight html %}
 # app/views/home/index.html.erb
-<h1>Comments</h1>
-<div id="content"></div>
+<div id="comments"></div>
 {% endhighlight %}
 
-The content div will be used as a starting point where we will render the stuff from React.
+The comments div will be used as a starting point where we will render the React stuff.
 
 #### Create your first React component!
 
