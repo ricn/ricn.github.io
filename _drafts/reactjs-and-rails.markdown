@@ -27,9 +27,9 @@ tutorial for React that you can find [here](http://facebook.github.io/react/docs
 
 ###### Components
 
-In React, components are the central building blocks of your application.
-Components are self-contained, modular, dynamic representations of HTML in your application.
-Components are often children of other React components. We will illustrate this later in this tutorial.
+In React, components are the central building blocks of your application. Components are self-contained, modular,
+dynamic representations of HTML in your application. Components are often children of other React components.
+We will illustrate this later in this tutorial how that works.
 
 Each React component has two types of inputs. The first one is properties (called props) and they are immutable.
 The second input is state which is mutable. When we change the state, React will automatically re-render the component
@@ -50,8 +50,10 @@ React.renderComponent(<HelloMessage name="Richard" />, mountNode);
 {% endhighlight %}
 
 Here you can see the render method that takes input data and returns what to display.
-This example uses an XML-like syntax called JSX. Input data that is passed into the component can be accessed by render() via this.props.
-JSX is optional and not required to use React. *Also notice the comment on the top of the file. It’s required to make the compilation from JSX to plain Javascript to work so it’s very important.*
+This example uses an XML-like syntax called [JSX](http://facebook.github.io/react/docs/jsx-in-depth.html). Input data that is passed into the component can be accessed by render() via this.props.
+JSX is optional and not required to use React.
+
+*Also notice the comment on the top of the file. It’s required to make the compilation from JSX to plain Javascript to work so it’s very important.*
 
 The JSX compiler will produce the following Javascript:
 
@@ -66,9 +68,29 @@ var HelloMessage = React.createClass({displayName: 'HelloMessage',
 React.renderComponent(HelloMessage({name: "John"}), mountNode);
 {% endhighlight %}
 
+#### What we are going to build
+
+As I wrote earlier, this tutorial is going to be heavily based on the tutorial you can find on the React home page.
+
+We'll be building a simple, but realistic comments box that you can drop into a blog, a basic version of the realtime comments offered by Disqus, LiveFyre or Facebook comments.
+
+We'll provide:
+
+1. A view of all of the comments
+2. A form to submit a comment
+3. A JSON API built with Rails to list and create new comments
+
+It'll also have a few neat features:
+
+Optimistic commenting: comments appear in the list before they're saved on the server so it feels fast.
+Live updates: as other users comment we'll pop them into the comment view in real time
+
 #### Setup the Rails API
 
-We need a Rails API for React frontend to communicate with in order to store and retrieve comments.
+The first thing we need to do is to setup the Rails backend so our React frontend
+can create and list comments from the server.
+
+Start by creating a new Rails project:
 
 {% highlight bash %}
 rails new react-demo
@@ -76,18 +98,18 @@ rails new react-demo
 
 First we need to add the following to our Gemfile:
 
+{% highlight ruby %}
 gem 'active_model_serializers'
 gem 'ffaker'
+{% endhighlight %}
 
-And you should also remove
+Run `bundle install` to install your gems.
 
-Run bundle install to install your gems.
-
-ActiveModel::Serializers encapsulates the JSON serialization of objects. Objects that respond to
+[The active_model_serializers gem](https://github.com/rails-api/active_model_serializers) encapsulates the JSON serialization of objects. Objects that respond to
 read_attribute_for_serialization (including ActiveModel and ActiveRecord objects) are supported. A serializer
 will automatically be created when we use the Rails generator to generate the comment resource.
 
-The ffaker gem will be used to create some sample data for our application.
+[The ffaker gem](https://github.com/EmmanuelOga/ffaker) will be used to create some sample data for our application.
 
 Next, we need to create our resource:
 
@@ -99,30 +121,19 @@ Because we are using the active_model_serializers gem, a serializer will automat
 be generated for us:
 
 {% highlight ruby %}
-  # app/serializers/comment_serializer.rb
-  class CommentSerializer < ActiveModel::Serializer
-    attributes :id, :comment, :author
-  end
+# app/serializers/comment_serializer.rb
+class CommentSerializer < ActiveModel::Serializer
+  attributes :id, :comment, :author
+end
 {% endhighlight %}
 
-Now that we have our resource and serializer, we can create the API controller.
-
-First we need routes for the API controller. Add them to the top of your Rails router:
-
-{% highlight ruby %}
-  # config/routes.rb
-  namespace :api do
-    namespace :v1 do
-      resources :comments
-    end
-  end
-{% endhighlight %}
+Now that we have our comment resource and serializer.
 
 Now we can create the comments api controller. The actions here are pretty standard:
 
 {% highlight ruby %}
 # app/controllers/api/v1/comments_controller.rb
-class Api::V1::CommentsController < ApplicationController
+class CommentsController < ApplicationController
   respond_to :json
 
   def index
@@ -130,7 +141,7 @@ class Api::V1::CommentsController < ApplicationController
   end
 
   def create
-    respond_with :api, :v1, Comment.create(comment_params)
+    respond_with Comment.create(comment_params)
   end
 
   private
@@ -141,43 +152,43 @@ class Api::V1::CommentsController < ApplicationController
 end
 {% endhighlight %}
 
-You should also remove the comments controller that were generated in app/controllers because we won't use that one.
-
-We can now create some sample data to test our new Rails API:
-
-Create a new rake task:
+We can now create some sample data to test our new Rails API. Create a new rake task:
 
 {% highlight ruby %}
-  # lib/tasks/populate.rake
-  namespace :db do
-    task populate: :environment do
+# lib/tasks/populate.rake
+namespace :db do
+  task populate: :environment do
 
-      Comment.destroy_all
+    Comment.destroy_all
 
-      10.times do
-        Comment.create(
-          author: Faker::Name.first_name + " " + Faker::Name.last_name,
-          comment: Faker::HipsterIpsum.words(10).join(' ')
-          )
-      end
+    10.times do
+      Comment.create(
+        author: Faker::Name.first_name + " " + Faker::Name.last_name,
+        comment: Faker::HipsterIpsum.words(10).join(' ')
+      )
     end
   end
+end
 {% endhighlight %}
 
 Now run:
 rake db:migrate
 rake db:populate
+rails server
 
-Restart the server, and now you should be able to visit:
-[http://localhost:3000/api/v1/comments.json](http://localhost:3000/api/v1/comments.json) and see the JSON output for all comments.
-[http://localhost:3000/api/v1/comments/1.json](http://localhost:3000/api/v1/comments/1.json) should show you the first comment.
+Now you can try out your comments API:
+
+[http://localhost:3000/comments.json](http://localhost:3000/comments.json) and see the JSON output for all comments.
 
 When you look at the json output you'll see that it has a root element for comments. To get rid of it we can create an initializer:
+
 {% highlight ruby %}
 # config/initializers/active_model_serializer.rb
 ActiveModel::Serializer.root = false
 ActiveModel::ArraySerializer.root = false
 {% endhighlight %}
+
+Restart your server and the root elements will now be gone.
 
 Now we have a fully functional Rails API that we can use in in the tutorial.
 
