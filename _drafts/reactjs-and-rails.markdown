@@ -10,9 +10,22 @@ categories: rails react
 
 #### Introduction
 
-Unlike Angular and Ember there is not much new lingo to learn when using React.
+[React](http://facebook.github.io/react/index.html) is often used as the V in MVC.
+Since React makes no assumptions about the rest of your technology stack, it's easy to try it out on a small
+feature in an existing project.
 
-*Components*
+React uses a virtual DOM diff implementation for ultra-high performance.
+It can also render on the server using Node.js — no heavy browser DOM required.
+
+React implements one-way reactive data flow which reduces boilerplate and is
+easier to reason about than traditional data binding.
+
+Unlike [AngularJS](https://angularjs.org/) and [Ember](http://emberjs.com/) there is not a lot of new concepts that you need to learn.
+
+In this tutorial I'm going to show you how to use React in [Rails](http://rubyonrails.org/). It's heavily based on the original
+tutorial for React that you can find [here](http://facebook.github.io/react/docs/tutorial.html) but I have added Rails specific parts to it.
+
+###### Components
 
 In React, components are the central building blocks of your application.
 Components are self-contained, modular, dynamic representations of HTML in your application.
@@ -20,7 +33,7 @@ Components are often children of other React components. We will illustrate this
 
 Each React component has two types of inputs. The first one is properties (called props) and they are immutable.
 The second input is state which is mutable. When we change the state, React will automatically re-render the component
-so we can see the changes in the UI. All React components must implement a render methond, which returns another React object or null.
+so we can see the changes in the UI. All React components must implement a render method, which returns another React object.
 
 This is a very simple React component:
 
@@ -33,10 +46,25 @@ var HelloMessage = React.createClass({
 });
 
 React.renderComponent(<HelloMessage name="Richard" />, mountNode);
+
 {% endhighlight %}
 
-*JSX*
-As you see in the example above, the render function 
+Here you can see the render method that takes input data and returns what to display.
+This example uses an XML-like syntax called JSX. Input data that is passed into the component can be accessed by render() via this.props.
+JSX is optional and not required to use React. *Also notice the comment on the top of the file. It’s required to make the compilation from JSX to plain Javascript to work so it’s very important.*
+
+The JSX compiler will produce the following Javascript:
+
+{% highlight javascript %}
+/** @jsx React.DOM */
+var HelloMessage = React.createClass({displayName: 'HelloMessage',
+  render: function() {
+    return React.DOM.div(null, "Hello ", this.props.name);
+  }
+});
+
+React.renderComponent(HelloMessage({name: "John"}), mountNode);
+{% endhighlight %}
 
 #### Setup the Rails API
 
