@@ -132,7 +132,7 @@ Now that we have our comment resource and serializer.
 Now we can create the comments api controller. The actions here are pretty standard:
 
 {% highlight ruby %}
-# app/controllers/api/v1/comments_controller.rb
+# app/controllers/comments_controller.rb
 class CommentsController < ApplicationController
   respond_to :json
 
@@ -256,6 +256,31 @@ After this we can replace the index view content for our home controller with th
 {% endhighlight %}
 
 The comments div will be used as a starting point where we will render the React stuff.
+
+OK, now we should have everything setup to start using React. To prove it we can add
+this Hello World example in `comments.js.jsx`:
+{% highlight javascript %}
+# app/assets/javascripts/comments.js.jsx
+/** @jsx React.DOM */
+var HelloWorld = React.createClass({
+  render: function() {
+    return (
+      <div className='HelloWorld'>
+        Hello, world!
+      </div>
+      );
+  }
+});
+
+var ready = function () {
+  React.renderComponent(
+    <HelloWorld />,
+    document.getElementById('comments')
+  );
+};
+
+$(document).ready(ready);
+{% endhighlight %}
 
 #### Create your first React component!
 
