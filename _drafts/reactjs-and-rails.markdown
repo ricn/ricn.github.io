@@ -172,9 +172,12 @@ end
 {% endhighlight %}
 
 Now run:
+
+{% highlight ruby %}
 rake db:migrate
 rake db:populate
 rails server
+{% endhighlight %}
 
 Now you can try out your comments API:
 
@@ -204,6 +207,34 @@ gem 'react-rails'
 {% endhighlight %}
 
 Run `bundle install`
+
+Then we need to add react to `application.js`:
+
+{% highlight javascript %}
+// app/assets/javascripts/application.js
+
+//= require react
+
+{% endhighlight %}
+
+Make sure to require react after turbolinks or weird things might happen.
+
+You also need to configure variants to use for different environments.
+There are 2 variants available. `:development` gives you the unminified version of React.
+This provides extra debugging and error prevention. `:production` gives you the minified version of
+React which strips out comments and helpful warnings, and minifies.
+
+{% highlight ruby %}
+# config/environments/development.rb
+Rails.application.configure do
+  config.react.variant = :development
+end
+
+# config/environments/production.rb
+Rails.application.configure do
+  config.react.variant = :production
+end
+{% endhighlight %}
 
 Next, we need to create a home controller which we will wire to the root url:
 
