@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "React and Rails"
-date:   2014-07-28 08:00:00
+date:   2014-07-31 08:00:00
 categories: rails react
 ---
 <p class="lead">
