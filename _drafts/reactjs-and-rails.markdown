@@ -452,28 +452,83 @@ a new one from the server by calling `this.setState({comments: comments})`
 The UI will automatically updates itself.
 
 #### The comment form component
+Now it's time to build the form. Our `CommentForm` component should ask the user
+for their name and comment text and send a request to the server to save the comment.
+
+When the user submits the form, we should clear it, submit a request to the server,
+and refresh the list of comments:
 
 {% highlight javascript %}
+var Comment = // Removed to save space
+
+var CommentList = // Removed to save space
+
+var CommentBox = React.createClass({
+  ...
+  handleCommentSubmit: function(comment) {
+    var comments = this.state.comments;
+    var newComments = comments.concat([comment]);
+    this.setState({comments: newComments});
+    $.ajax({
+      url: this.props.url,
+      dataType: 'json',
+      type: 'POST',
+      data: {"comment": comment},
+      success: function(data) {
+        this.loadCommentsFromServer();
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  },
+  render: function () {
+    return (
+      <div className="commentBox">
+        <h1>Comments</h1>
+        <CommentList comments={this.state.comments} />
+        <CommentForm onCommentSubmit={this.handleCommentSubmit}/>
+      </div>
+      );
+  }
+});
+
 var CommentForm = React.createClass({
-  handleSubmit: function () {
+  handleSubmit: function() {
     var author = this.refs.author.getDOMNode().value.trim();
     var comment = this.refs.comment.getDOMNode().value.trim();
-    if (!comment || !author) {
-      return false;
-    }
     this.props.onCommentSubmit({author: author, comment: comment});
     this.refs.author.getDOMNode().value = '';
     this.refs.comment.getDOMNode().value = '';
     return false;
   },
-  render: function () {
+  render: function() {
     return (
       <form className="commentForm" onSubmit={this.handleSubmit}>
-        <input type="text" placeholder="Your name" ref="author"/>
-        <input type="text" placeholder="Say something..." ref="comment"/>
+        <input type="text" placeholder="Your name" ref="author" />
+        <input type="text" placeholder="Say something..." ref="comment" />
         <input type="submit" value="Post" />
       </form>
-    );
+      );
   }
 });
 {% endhighlight %}
+
+React attaches `event handlers` to components using a camelCase naming convention.
+We attach an onSubmit handler to the form that handles the submit and clears the form afterwards.
+We always return false from the event handler to prevent the browser's default action of submitting the form. Also notice
+the `ref` attributes used in the JSX code for the inputs. We use the `ref` attribute to assign a name to a child component
+and `this.refs` to reference the component. We can call `getDOMNode()` on a component to get the native browser DOM element.
+
+Also notice that we have changed `CommentBox` component. The render method now contains
+the `CommentForm` component and when you click submit, the handleCommentSubmit method
+will be executed. This method posts the new comment to the server and updates the state to reflect
+the changes.
+
+The complete comments.js.jsx can be found here: [https://gist.github.com/ricn/678fff7f0f7749e15080](https://gist.github.com/ricn/678fff7f0f7749e15080)
+
+#### Conclusions
+
+Compared to another solutions, you won't spend much time learning React. You should really give it a shot in your project.
+
+If you look for more information on React, check out official docs and sign-up for our newsletter below. We are going to write more about React.js
