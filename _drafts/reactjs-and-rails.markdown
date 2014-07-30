@@ -431,7 +431,27 @@ $(document).ready(ready);
 {% endhighlight %}
 
 As you can see, the CommentBox is a little bit more complicated and contains
-more React specific
+more React specific code that we need to explain.
+
+The first thing is the how `state` works. So far, each component has rendered itself once based on its props.
+`props` are immutable: they are passed from the parent and are "owned" by the parent.
+
+To implement interactions, we introduce mutable state to the component.
+`this.state` is private to the component and can be changed by calling `this.setState()`.
+When the state is updated, the component re-renders itself.
+
+The `getInitialState` method is a special method that executes exactly once during the
+lifecycle of the component and sets up the initial state of the component. In the CommentBox we
+set an empty list with comments.
+
+The next method is `componentDidMount` which is autmatically called by React when the
+component is rendered. In this example we only execute the `loadCommentsFromServer`.
+This method uses plain old [jQuery](http://jquery.com/) to fetch comments from our API.
+
+When we get a successful response from the server, we change the state of the old comments array with 
+a new one from the server by calling `this.setState({comments: comments})`
+
+The UI will automatically updates itself.
 
 #### The comment form component
 
