@@ -10,30 +10,29 @@ categories: rails react
 
 #### Introduction
 
-[React](http://facebook.github.io/react/index.html) is often used as the V in MVC.
-Since React makes no assumptions about the rest of your technology stack, it's easy to try it out on a small
-feature in an existing project.
+[React](http://facebook.github.io/react/index.html) is often used as the V in MVC and
+since it makes no assumptions about the rest of your technology stack and it's easy to
+try it out on a small feature in an existing project. And besides that, it's not
+so many new concepts to learn compared to [AngularJS](https://angularjs.org/) and [Ember](http://emberjs.com/).
 
-React uses a virtual DOM diff implementation for ultra-high performance.
-It can also render on the server using Node.js — no heavy browser DOM required.
+React uses a virtual DOM diff implementation to achieve very high performance.
+It's even possible to do the rendering on the server. If you want to learn more
+about the virtual DOM in React you should take a look at
+[The Secrets of React's Virtual DOM (FutureJS 2014)](https://www.youtube.com/watch?v=-DX3vJiqxm4) by
+[Pete Hunt](https://twitter.com/floydophone)
 
-React implements one-way reactive data flow which reduces boilerplate and is
-easier to reason about than traditional data binding.
+In this tutorial I'm going to show you how to use React in [Rails](http://rubyonrails.org/). It's heavily based on the [original
+tutorial for React](http://facebook.github.io/react/docs/tutorial.html) but I have added Rails specific parts to it.
 
-Unlike [AngularJS](https://angularjs.org/) and [Ember](http://emberjs.com/) there is not a lot of new concepts that you need to learn.
-
-In this tutorial I'm going to show you how to use React in [Rails](http://rubyonrails.org/). It's heavily based on the original
-tutorial for React that you can find [here](http://facebook.github.io/react/docs/tutorial.html) but I have added Rails specific parts to it.
-
-###### Components
+###### It's all about components
 
 In React, components are the central building blocks of your application. Components are self-contained, modular,
 dynamic representations of HTML in your application. Components are often children of other React components.
 We will illustrate this later in this tutorial how that works.
 
-Each React component has two types of inputs. The first one is properties (called props) and they are immutable.
-The second input is state which is mutable. When we change the state, React will automatically re-render the component
-so we can see the changes in the UI. All React components must implement a render method, which returns another React object.
+Each React component has two types of inputs. The first one is properties (called `props`) and they are immutable.
+The second input is `state` which is mutable. When we change the state, React will automatically re-render the component
+so we can see the changes in the UI. All React components must implement a render method, which returns the HTML output.
 
 This is a very simple React component:
 
@@ -50,8 +49,9 @@ React.renderComponent(<HelloMessage name="Richard" />, mountNode);
 {% endhighlight %}
 
 Here you can see the render method that takes input data and returns what to display.
-This example uses an XML-like syntax called [JSX](http://facebook.github.io/react/docs/jsx-in-depth.html). Input data that is passed into the component can be accessed by render() via this.props.
-JSX is optional and not required to use React.
+This example uses an XML-like syntax called [JSX](http://facebook.github.io/react/docs/jsx-in-depth.html).
+Input data that is passed into the component can be accessed by render() via this.props.
+JSX is optional in React so if you want to, you can implement the returning HTML in pure Javascript.
 
 *Also notice the comment on the top of the file. It’s required to make the compilation from JSX to plain Javascript to work so it’s very important.*
 
@@ -65,19 +65,22 @@ var HelloMessage = React.createClass({displayName: 'HelloMessage',
   }
 });
 
-React.renderComponent(HelloMessage({name: "John"}), mountNode);
+React.renderComponent(HelloMessage({name: "Richard"}), mountNode);
 {% endhighlight %}
 
 #### What we are going to build
 
 As I wrote earlier, this tutorial is going to be heavily based on the tutorial you can find on the React home page.
 
-We'll be building a simple, but realistic comments box that you can drop into a blog, a basic version of the realtime comments offered by Disqus, LiveFyre or Facebook comments.
+We'll build a simple comments box that you can drop into a blog, a basic version of
+the comments functionality offered by Disqus or Facebook comments.
 
 We'll provide:
 
-1. A view of all of the comments
+1. A view of all the comments
+
 2. A form to submit a comment
+
 3. A JSON API built with Rails to list and create new comments
 
 #### Setup the Rails API
@@ -121,8 +124,6 @@ class CommentSerializer < ActiveModel::Serializer
   attributes :id, :comment, :author
 end
 {% endhighlight %}
-
-Now that we have our comment resource and serializer.
 
 Now we can create the comments api controller. The actions here are pretty standard:
 
@@ -188,12 +189,12 @@ ActiveModel::ArraySerializer.root = false
 
 Restart your server and the root elements will now be gone.
 
-Now we have a fully functional Rails API that we can use in in the tutorial.
+Now we have a fully functional Rails API that we can use.
 
 #### Setup React in Rails
 
-For this tutorial we are going to use [the react-rails gem](https://github.com/reactjs/react-rails) which installs the required
-js-files needed.
+For this tutorial we are going to use [the react-rails gem](https://github.com/reactjs/react-rails)
+which installs the required Javascript files needed.
 
 Open your Gemfile and add the following:
 
@@ -215,9 +216,9 @@ Then we need to add react to `application.js`:
 Make sure to require react after turbolinks or weird things might happen.
 
 You also need to configure variants to use for different environments.
-There are 2 variants available. `:development` gives you the unminified version of React.
+There are two variants available. `:development` gives you the unminified version of React.
 This provides extra debugging and error prevention. `:production` gives you the minified version of
-React which strips out comments and helpful warnings, and minifies.
+React which strips out comments and helpful warnings.
 
 {% highlight ruby %}
 # config/environments/development.rb
@@ -332,7 +333,7 @@ You can now refresh your the page in your browser and you should see the comment
 
 #### Implementing the CommentList component
 
-The next component we need to add the CommentList component which will
+The next component we need to add is the CommentList component which will
 be responsible for rendering a list of comments:
 
 {% highlight javascript %}
@@ -370,20 +371,20 @@ var ready = function () {
 $(document).ready(ready);
 {% endhighlight %}
 
-OK, let's start from the bottom and take a look at the `React.renderComponent` method.
+OK, let's start from the bottom and take a look at the `React.renderComponent` call.
 We're now passing in an array with fake comments to the `CommentList` component.
 
 In the render method in `CommentList` we're using the map function to iterate thru
 the array of comments and returning a new array with new Comment component instances.
 
-Then we just renders the comment list and adds the list with comment components.
+Then we just render the `CommentList` and adds the list with comments.
 
 Refresh the page in the browser and you should now see two hard coded comments.
 
 #### Implement the CommentBox component
 
-Now is the time to add the top level `CommentBox` component. The CommentBox will
-be responsible to display the CommentList and the CommentForm (we will implement it later) on the page. It's also
+Now is the time to add the top level `CommentBox` component. The `CommentBox` will
+be responsible for displaying the `CommentList` and the `CommentForm` (we will implement it later) on the page. It's also
 this component that will talk to our backend:
 
 {% highlight javascript %}
@@ -448,7 +449,7 @@ The next method is `componentDidMount` which is autmatically called by React whe
 component is rendered. In this example we only execute the `loadCommentsFromServer`.
 This method uses plain old [jQuery](http://jquery.com/) to fetch comments from our API.
 
-When we get a successful response from the server, we change the state of the old comments array with 
+When we get a successful response from the server, we change the state of the old comments array with
 a new one from the server by calling `this.setState({comments: comments})`
 
 The UI will automatically updates itself.
