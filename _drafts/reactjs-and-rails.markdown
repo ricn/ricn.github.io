@@ -255,7 +255,7 @@ After this we can replace the index view content for our home controller with th
 The comments div will be used as a starting point where we will render the React stuff.
 
 OK, now we should have everything setup to start using React. To prove it we can add
-this Hello World example in `comments.js.jsx`:
+this Hello World example in a file called `comments.js.jsx` (you should remove the comments.js file that already exists):
 {% highlight javascript %}
 # app/assets/javascripts/comments.js.jsx
 /** @jsx React.DOM */
@@ -527,8 +527,8 @@ the changes.
 
 The complete comments.js.jsx can be found here: [https://gist.github.com/ricn/678fff7f0f7749e15080](https://gist.github.com/ricn/678fff7f0f7749e15080)
 
-#### Conclusions
+#### Congrats!
 
-Compared to another solutions, you won't spend much time learning React. You should really give it a shot in your project.
+You have just built a comment box in a few simple steps using Rails as the backend.
 
-If you look for more information on React, check out official docs and sign-up for our newsletter below. We are going to write more about React.js
+If you look for more information on React, check out [official docs](http://facebook.github.io/react/docs/getting-started.html).
