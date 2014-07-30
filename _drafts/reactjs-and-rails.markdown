@@ -282,62 +282,98 @@ var ready = function () {
 $(document).ready(ready);
 {% endhighlight %}
 
-#### Create your first React component!
+When you visit [http://localhost:3000](http://localhost:3000) you should now see `Hello, world!`
 
-React is all about modular and composable components. The following component structure will be used in this tutorial:
+#### Implementing the comment component
 
-* -- CommentBox
-  * -- CommentList
-    * -- Comment
-  * -- CommentForm
+Now is the time to start implementing the real React components for this tutorial.
+As we said earlier React is all about modular and composable component.
 
-Now is the time to actually add some React specific code to our project
+The following component structure will be used in this tutorial:
 
-When we generated our comment resource a comments.js file were created in
-assets/javascripts/ folder. First we need to rename it to comments.js.jsx. This is
-needed to transform your JSX code into JavaScript.
+* ###### - CommentBox
+  * ###### - CommentList
+    * ###### - Comment
+  * ###### - CommentForm
 
-Add the following code:
+We're going to implement the components from inside out so the first one will be the Comment component.
+The comment component will be responsible for rendering a single comment with an author and comment text property:
+
+Replace the Hello World example in your `comments.js.jsx` with this:
 
 {% highlight javascript %}
 # app/assets/javascripts/comments.js.jsx
 /** @jsx React.DOM */
-var CommentBox = React.createClass({
-  render: function() {
+var Comment = React.createClass({
+  render: function () {
     return (
-      <div className='commentBox'>
-        Hello, world! I am a CommentBox.
+      <div className="comment">
+        <h2 className="commentAuthor">
+          {this.props.author}
+        </h2>
+          {this.props.comment}
       </div>
-    );
+      );
   }
 });
 
 var ready = function () {
-    React.renderComponent(
-        <CommentBox />,
-        document.getElementById('content')
-    );
+  React.renderComponent(
+    <Comment author="Richard" comment="This is a comment "/>,
+    document.getElementById('comments')
+  );
 };
 
 $(document).ready(ready);
 {% endhighlight %}
 
-Restart your server and you should see "Hello, world! I am a CommentBox." displayed on your page.
+So the only thing that's different here compared to the Hello World component is
+that we're passing in hard coded properties that we use in the render method.
+By surrounding a JavaScript expression in braces inside JSX , you can drop text or React components into the tree.
+We access named attributes passed to the component as keys on this.props.
 
-The first thing you'll notice is the XML-ish syntax in your JavaScript.
-We have a simple precompiler that translates the syntactic sugar to this plain JavaScript.
-Its use is optional but we've found JSX syntax easier to use than plain JavaScript. Read more on the [JSX Syntax article](http://facebook.github.io/react/docs/jsx-in-depth.html).
-Also notice the comment on the top of the file. It's required to make the compilation from JSX to plain Javascript to work so it's very important.
+You can now refresh your the page in your browser and you should see the comment.
 
-*What's going on*
+#### Implementing the CommentList component
 
-We pass some methods in a JavaScript object to React.createClass() to create a new React component. The most important of these methods is called render which returns a tree of React components that will eventually render to HTML.
+The next component we need to add the CommentList component which will
+be responsible for rendering a list of comments:
 
-The <div> tags are not actual DOM nodes; they are instantiations of React div components. You can think of these as markers or pieces of data that React knows how to handle. React is safe. We are not generating HTML strings so XSS protection is the default.
+{% highlight javascript %}
+/** @jsx React.DOM */
+var Comment = // Removed to save space
 
-You do not have to return basic HTML. You can return a tree of components that you (or someone else) built. This is what makes React composable: a key tenet of maintainable frontends.
+var CommentList = React.createClass({
+  render: function () {
+    var commentNodes = this.props.comments.map(function (comment, index) {
+      return (
+        <Comment author={comment.author} comment={comment.comment} key={index} />
+        );
+    });
 
-React.renderComponent() instantiates the root component, starts the framework, and injects the markup into a raw DOM element, provided as the second argument.
+    return (
+      <div className="commentList">
+        {commentNodes}
+      </div>
+      );
+  }
+});
+
+var ready = function () {
+  var fakeComments = [
+    { author:"Richard", comment:"This is a comment" },
+    { author:"Nils", comment:"This is another comment" }
+  ];
+
+  React.renderComponent(
+    <CommentList comments={fakeComments} />,
+    document.getElementById('comments')
+  );
+};
+
+$(document).ready(ready);
+{% endhighlight %}
+
 
 #### The CommentBox component
 {% highlight javascript %}
@@ -389,30 +425,6 @@ var CommentBox = React.createClass({
   }
 });
 {% endhighlight %}
-
-#### The comment list component
-
-{% highlight javascript %}
-var CommentList = React.createClass({
-  render: function () {
-    console.log(this.props);
-    var commentNodes = this.props.data.map(function (comment, index) {
-      return (
-        <Comment author={comment.author} key={index}>
-          <p>{comment.comment}</p>
-        </Comment>
-      );
-    });
-
-    return (
-      <div className="commentList">
-        {commentNodes}
-      </div>
-    );
-  }
-});
-{% endhighlight %}
-
 
 #### The comment form component
 
