@@ -80,11 +80,6 @@ We'll provide:
 2. A form to submit a comment
 3. A JSON API built with Rails to list and create new comments
 
-It'll also have a few neat features:
-
-Optimistic commenting: comments appear in the list before they're saved on the server so it feels fast.
-Live updates: as other users comment we'll pop them into the comment view in real time
-
 #### Setup the Rails API
 
 The first thing we need to do is to setup the Rails backend so our React frontend
@@ -242,9 +237,10 @@ Next, we need to create a home controller which we will wire to the root url:
 rails g controller home index
 {% endhighlight %}
 
-Then open up your routes.rb file and add this:
+Then open up your `routes.rb` file and add this:
 
 {% highlight ruby %}
+# config/routes.rb
 root 'home#index'
 {% endhighlight %}
 
@@ -374,57 +370,68 @@ var ready = function () {
 $(document).ready(ready);
 {% endhighlight %}
 
+OK, let's start from the bottom and take a look at the `React.renderComponent` method.
+We're now passing in an array with fake comments to the `CommentList` component.
 
-#### The CommentBox component
+In the render method in `CommentList` we're using the map function to iterate thru
+the array of comments and returning a new array with new Comment component instances.
+
+Then we just renders the comment list and adds the list with comment components.
+
+Refresh the page in the browser and you should now see two hard coded comments.
+
+#### Implement the CommentBox component
+
+Now is the time to add the top level `CommentBox` component. The CommentBox will
+be responsible to display the CommentList and the CommentForm (we will implement it later) on the page. It's also
+this component that will talk to our backend:
+
 {% highlight javascript %}
+/** @jsx React.DOM */
+var Comment = // Removed to save space
+var CommentList = // Removed to save space
+
 var CommentBox = React.createClass({
+  getInitialState: function () {
+    return {comments: []};
+  },
+  componentDidMount: function () {
+    this.loadCommentsFromServer();
+  },
   loadCommentsFromServer: function () {
     $.ajax({
       url: this.props.url,
       dataType: 'json',
-      success: function (data) {
-        this.setState({data: data});
+      success: function (comments) {
+        this.setState({comments: comments});
       }.bind(this),
       error: function (xhr, status, err) {
         console.error(this.props.url, status, err.toString());
       }.bind(this)
     });
-  },
-  handleCommentSubmit: function (comment) {
-    var comments = this.state.data;
-    var newComments = comments.concat([comment]);
-    this.setState({data: newComments});
-    $.ajax({
-      url: this.props.url,
-      dataType: 'json',
-      type: 'POST',
-      data: { "comment": comment },
-      success: function (data) {
-        this.loadCommentsFromServer();
-      }.bind(this),
-      error: function (xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
-    });
-  },
-  getInitialState: function () {
-    return {data: []};
-  },
-  componentDidMount: function () {
-    this.loadCommentsFromServer();
-    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
   },
   render: function () {
     return (
       <div className="commentBox">
         <h1>Comments</h1>
-        <CommentList data={this.state.data} />
-        <CommentForm onCommentSubmit={this.handleCommentSubmit} />
+        <CommentList comments={this.state.comments} />
       </div>
-    );
+      );
   }
 });
+
+var ready = function () {
+  React.renderComponent(
+    <CommentBox url="/comments.json" />,
+    document.getElementById('comments')
+  );
+};
+
+$(document).ready(ready);
 {% endhighlight %}
+
+As you can see, the CommentBox is a little bit more complicated and contains
+more React specific
 
 #### The comment form component
 
@@ -449,23 +456,6 @@ var CommentForm = React.createClass({
         <input type="submit" value="Post" />
       </form>
     );
-  }
-});
-{% endhighlight %}
-
-#### The comment component
-
-{% highlight javascript %}
-var Comment = React.createClass({
-  render: function () {
-    return (
-      <div className="comment">
-        <h2 className="commentAuthor">
-          {this.props.author}
-        </h2>
-          {this.props.children}
-      </div>
-      );
   }
 });
 {% endhighlight %}
