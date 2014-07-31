@@ -16,10 +16,10 @@ try it out on a small feature in an existing project. And besides that, it's not
 so many new concepts to learn compared to [AngularJS](https://angularjs.org/) and [Ember](http://emberjs.com/).
 
 React uses a virtual DOM diff implementation to achieve very high performance.
-It's even possible to do the rendering on the server. If you want to learn more
+It's also possible to do the rendering on the server. If you want to learn more
 about the virtual DOM in React you should take a look at
 [The Secrets of React's Virtual DOM (FutureJS 2014)](https://www.youtube.com/watch?v=-DX3vJiqxm4) by
-[Pete Hunt](https://twitter.com/floydophone)
+[Pete Hunt](https://twitter.com/floydophone).
 
 In this tutorial I'm going to show you how to use React in [Rails](http://rubyonrails.org/). It's heavily based on the [original
 tutorial for React](http://facebook.github.io/react/docs/tutorial.html) but I have added Rails specific parts to it.
@@ -28,7 +28,7 @@ tutorial for React](http://facebook.github.io/react/docs/tutorial.html) but I ha
 
 In React, components are the central building blocks of your application. Components are self-contained, modular,
 dynamic representations of HTML in your application. Components are often children of other React components.
-We will illustrate this later in this tutorial how that works.
+We will illustrate how that works later in this tutorial.
 
 Each React component has two types of inputs. The first one is properties (called `props`) and they are immutable.
 The second input is `state` which is mutable. When we change the state, React will automatically re-render the component
@@ -50,10 +50,11 @@ React.renderComponent(<HelloMessage name="Richard" />, mountNode);
 
 Here you can see the render method that takes input data and returns what to display.
 This example uses an XML-like syntax called [JSX](http://facebook.github.io/react/docs/jsx-in-depth.html).
-Input data that is passed into the component can be accessed by render() via this.props.
+Input data that is passed into the component can be accessed by `render()` via `this.props`.
 JSX is optional in React so if you want to, you can implement the returning HTML in pure Javascript.
 
-*Also notice the comment on the top of the file. It’s required to make the compilation from JSX to plain Javascript to work so it’s very important.*
+*Attention: Notice the comment on top of the file. It’s required to make the compilation from JSX to plain
+Javascript to work.*
 
 The JSX compiler will produce the following Javascript:
 
