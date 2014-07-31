@@ -293,8 +293,8 @@ The following component structure will be used in this tutorial:
     * ###### - Comment
   * ###### - CommentForm
 
-We're going to implement the components from inside out so the first one will be the Comment component.
-The comment component will be responsible for rendering a single comment with an author and comment text property:
+We're going to implement the components from inside out so the first one will be the `Comment` component.
+The `Comment` component will be responsible for rendering a single comment with an author and comment text property:
 
 Replace the Hello World example in your `comments.js.jsx` with this:
 
@@ -327,9 +327,9 @@ $(document).ready(ready);
 So the only thing that's different here compared to the Hello World component is
 that we're passing in hard coded properties that we use in the render method.
 By surrounding a JavaScript expression in braces inside JSX , you can drop text or React components into the tree.
-We access named attributes passed to the component as keys on this.props.
+We access named attributes passed to the component as keys on `this.props`.
 
-You can now refresh your the page in your browser and you should see the comment.
+You can now refresh the page in your browser and you should see the comment.
 
 #### Implementing the CommentList component
 
