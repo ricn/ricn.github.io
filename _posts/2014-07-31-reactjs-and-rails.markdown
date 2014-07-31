@@ -531,4 +531,4 @@ The complete `comments.js.jsx` can be found here: [https://gist.github.com/ricn/
 
 You have just built a comment box in a few simple steps using Rails as the backend.
 
-If you look for more information on React, check out [official docs](http://facebook.github.io/react/docs/getting-started.html).
+If you look for more information on React, check out the [official docs](http://facebook.github.io/react/docs/getting-started.html).
