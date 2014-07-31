@@ -245,7 +245,7 @@ Then open up your `routes.rb` file and add this:
 root 'home#index'
 {% endhighlight %}
 
-After this we can replace the index view content for our home controller with the following content:
+After this we can replace the index view content with the following content:
 
 {% highlight html %}
 # app/views/home/index.html.erb
