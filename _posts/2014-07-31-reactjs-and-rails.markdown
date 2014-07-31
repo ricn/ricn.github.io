@@ -515,7 +515,7 @@ var CommentForm = React.createClass({
 {% endhighlight %}
 
 React attaches `event handlers` to components using a camelCase naming convention.
-We attach an onSubmit handler to the form that handles the submit and clears the form afterwards.
+We attach an `onSubmit` handler to the form that handles the submit and clears the form afterwards.
 We always return false from the event handler to prevent the browser's default action of submitting the form. Also notice
 the `ref` attributes used in the JSX code for the inputs. We use the `ref` attribute to assign a name to a child component
 and `this.refs` to reference the component. We can call `getDOMNode()` on a component to get the native browser DOM element.
@@ -525,7 +525,7 @@ the `CommentForm` component and when you click submit, the handleCommentSubmit m
 will be executed. This method posts the new comment to the server and updates the state to reflect
 the changes.
 
-The complete comments.js.jsx can be found here: [https://gist.github.com/ricn/678fff7f0f7749e15080](https://gist.github.com/ricn/678fff7f0f7749e15080)
+The complete `comments.js.jsx` can be found here: [https://gist.github.com/ricn/678fff7f0f7749e15080](https://gist.github.com/ricn/678fff7f0f7749e15080)
 
 #### Congrats!
 
