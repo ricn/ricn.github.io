@@ -82,7 +82,7 @@ We'll provide:
 
 2. A form to submit a comment
 
-3. A JSON API built with Rails to list and create new comments
+3. A JSON API built with Rails to list and create new comments.
 
 #### Setup the Rails API
 
@@ -104,11 +104,10 @@ gem 'ffaker'
 
 Run `bundle install` to install your gems.
 
-[The active_model_serializers gem](https://github.com/rails-api/active_model_serializers) encapsulates the JSON serialization of objects. Objects that respond to
-read_attribute_for_serialization (including ActiveModel and ActiveRecord objects) are supported. A serializer
-will automatically be created when we use the Rails generator to generate the comment resource.
+[The active_model_serializers gem](https://github.com/rails-api/active_model_serializers) encapsulates the JSON serialization of ActiveRecord objects.
+A serializer will automatically be created when we use the Rails generator to generate the comment resource.
 
-[The ffaker gem](https://github.com/EmmanuelOga/ffaker) will be used to create some sample data for our application.
+[The ffaker gem](https://github.com/EmmanuelOga/ffaker) will be used to create sample data for our application.
 
 Next, we need to create our resource:
 
