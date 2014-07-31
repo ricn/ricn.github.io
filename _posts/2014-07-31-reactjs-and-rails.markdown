@@ -333,7 +333,7 @@ You can now refresh the page in your browser and you should see the comment.
 
 #### Implementing the CommentList component
 
-The next component we need to add is the CommentList component which will
+The next component we need to add is the `CommentList` component which will
 be responsible for rendering a list of comments:
 
 {% highlight javascript %}
@@ -375,7 +375,7 @@ OK, let's start from the bottom and take a look at the `React.renderComponent` c
 We're now passing in an array with fake comments to the `CommentList` component.
 
 In the render method in `CommentList` we're using the map function to iterate thru
-the array of comments and returning a new array with new Comment component instances.
+the array of comments and returning a new array with new `Comment` component instances.
 
 Then we just render the `CommentList` and adds the list with comments.
 
@@ -431,7 +431,7 @@ var ready = function () {
 $(document).ready(ready);
 {% endhighlight %}
 
-As you can see, the CommentBox is a little bit more complicated and contains
+As you can see, the `CommentBox` is a little bit more complicated and contains
 more React specific code that we need to explain.
 
 So far, each component has rendered itself once based on its props. To implement interactions,
@@ -439,7 +439,7 @@ we introduce mutable state to the component. `this.state` is private to the comp
 changed by calling `this.setState()`. When the state is updated, the component re-renders itself.
 
 The `getInitialState` method is a special method that executes exactly once during the
-lifecycle of the component and sets up the initial state of the component. In the CommentBox we
+lifecycle of the component and sets up the initial state of the component. In the `CommentBox` we
 set an empty list with comments.
 
 The next method is `componentDidMount` which is automatically called by React when the
