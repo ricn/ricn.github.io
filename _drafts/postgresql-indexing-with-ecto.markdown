@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "PostgreSQL indexing in Elixir"
+title: "PostgreSQL indexing with Ecto"
 date:   2015-08-18 08:00:00
 categories: elixir ecto postgresql
 ---
