@@ -20,7 +20,7 @@ You should be familiar with [Ecto](https://github.com/elixir-lang/ecto) and know
 Ok, let's start with the basics. In general it's a good practice to add an index for the primary key in your tables. If your table will have a large number of rows it makes good use of an index and the lookup will take place in the index instead of sequentially scan your table for the matching rows. Luckily, PostgreSQL automatically creates an index for primary keys to enforce uniqueness. Thus, it is not necessary to create an index explicitly for primary key columns:
 
 {% highlight elixir %}
-defmodule EctoIndex.Repo.Migrations.AddProductTable do
+defmodule EctoIndex.Repo.Migrations.AddTables do
   use Ecto.Migration
 
   def change do
@@ -48,11 +48,11 @@ As you can see, you now have an primary key index using the btree type to index 
 
 #### Foreign keys and other commonly used columns
 
-Just like primary keys, foreign keys in your table will be indexed automatically in Ecto if you use the `references/2` function:
+Just like primary keys, foreign keys in your table will be indexed automatically in Ecto when you use the `references/2` function.
+For other commonly used columns that need to be sorted, lookup fields and columns that are used with GROUP BY it's a good
+idea to add indexes.
 
- So it's always a good idea to add indexes for foreign keys, columns that need to be sorted, lookup fields and columns that are used with the `group` method (GROUP BY) in the [Active Record Query Interface](http://guides.rubyonrails.org/active_record_querying.html).
-
-One of the most common performance problem with rails applications is the lack of indexes on foreign keys. Luckily it's very easy to avoid this pitfall:
+Let's change our migration script to illustrate this:
 
 {% highlight ruby %}
 class CreateProducts < ActiveRecord::Migration
