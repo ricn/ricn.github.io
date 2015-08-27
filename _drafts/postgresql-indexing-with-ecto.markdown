@@ -48,11 +48,9 @@ As you can see, you now have an primary key index using the btree type to index 
 
 #### Foreign keys and other commonly used columns
 
-Just like primary keys, foreign keys in your table will be indexed automatically in Ecto when you use the `references/2` function.
-For other commonly used columns that need to be sorted, lookup fields and columns that are used with GROUP BY it's a good
-idea to add indexes by using the `index/3` function.
+Unlike primary keys, foreign keys and other columns in your table will not be indexed automatically in PostgreSQL. So it’s always a good idea to add indexes for foreign keys, columns that need to be sorted, lookup fields and columns that are used with GROUP BY.
 
-Let's change our migration script to illustrate this:
+Luckily it’s very easy to add them. Let's change our migration script to illustrate this:
 
 {% highlight elixir %}
 defmodule EctoIndex.Repo.Migrations.AddTables do
@@ -69,6 +67,7 @@ defmodule EctoIndex.Repo.Migrations.AddTables do
       add :group_id, references(:groups)
     end
 
+		create index(:users, [:group_id])
     create index(:users, [:dob])
   end
 end
@@ -78,7 +77,6 @@ end
 And after adding the migration above you should see this in psql:
 
 {% highlight sql %}
-
 ecto_index=# \d users
                                   Table "public.users"
   Column   |          Type          |                     Modifiers
@@ -90,13 +88,13 @@ ecto_index=# \d users
 Indexes:
     "users_pkey" PRIMARY KEY, btree (id)
     "users_dob_index" btree (dob)
+    "users_group_id_index" btree (group_id)
 Foreign-key constraints:
     "users_group_id_fkey" FOREIGN KEY (group_id) REFERENCES groups(id)
 {% endhighlight %}
 
 Notice that we now have an index called `users_dob_index` for the dob column. So that extra call to the `index/3` function
-creates an index using btree for us. Also notice that now have a foreign constraint added as well. This index/constraint
-is created when use the `references/2` function when adding columns to out table.
+creates an index using btree for us. Also notice that we now have foreign constraint and an index for the group_id column.
 
 #### Unique Indexes
 
