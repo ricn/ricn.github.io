@@ -98,38 +98,47 @@ creates an index using btree for us. Also notice that we now have foreign constr
 
 #### Unique Indexes
 
-If you create a unique index for a column it means you're guaranteed the table won't have more than one row with the same value for that column. Using only `validates_uniqueness_of` validation in your model isn't enough to enforce uniqueness because there can be concurrent users trying to create the same data.
+If you create a unique index for a column it means you're guaranteed the table won't have more than one row with the same value for that column.
+Unique indexes are typical for things like username or email that's used to login to an application.
 
-Imagine that two users tries to register an account with the same username where you have added `validates_uniqueness_of :username` in your user model. If they hit the "Sign up" button at the same time, Rails will look in the user table for that username and respond back that everything is fine and that it's ok to save the record to the table. Rails will then save the two records to the user table with the same username and now you have a really shitty problem to deal with.
+This is how you create a unique index with Ecto:
 
 To avoid this you need to create a unique constraint at the database level as well:
-{% highlight ruby %}
-class CreateUsers < ActiveRecord::Migration
-  def change
-    create_table :users do |t|
-      t.string :username
-      ...
+{% highlight elixir %}
+defmodule EctoIndex.Repo.Migrations.AddTables do
+  use Ecto.Migration
+
+  def change do
+    create table(:users) do
+      add :email, :string
     end
 
-    add_index :users, :username, unique: true
+    create unique_index(:users, [:email])
   end
 end
 {% endhighlight %}
 
 In psql:
 {% highlight sql %}
-indexes_development=# \d users
-                                  Table "public.users"
-  Column  |          Type          |                     Modifiers
-----------+------------------------+----------------------------------------------------
- id       | integer                | not null default nextval('users_id_seq'::regclass)
- username | character varying(255) |
+ecto_index=# \d users
+                                 Table "public.users"
+ Column |          Type          |                     Modifiers
+--------+------------------------+----------------------------------------------------
+ id     | integer                | not null default nextval('users_id_seq'::regclass)
+ email  | character varying(255) |
 Indexes:
     "users_pkey" PRIMARY KEY, btree (id)
-    "index_users_on_username" UNIQUE, btree (username)
+    "users_email_index" UNIQUE, btree (email)
 {% endhighlight %}
 
-So by creating the `index_users_on_username` unique index you get two very nice benefits. Data integrity as descibed above and good performance because unique indexes tends to be very fast.
+So by creating the `users_email_index` unique index you get some very nice benefits. Data integrity and good performance because unique indexes tends to be very fast. You also get the possibility to use the `unique_constraint/3` function in changesets:
+
+{% highlight sql %}
+	cast(user, params, ~w(email), ~w())
+	|> unique_constraint(:email)
+{% endhighlight %}
+
+The validation function works by relying on the database to check if the unique constraint has been violated or not and, if so, Ecto converts it into a changeset error.
 
 #### Sorted Indexes
 
