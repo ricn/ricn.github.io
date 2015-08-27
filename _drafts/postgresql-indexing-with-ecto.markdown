@@ -50,45 +50,53 @@ As you can see, you now have an primary key index using the btree type to index 
 
 Just like primary keys, foreign keys in your table will be indexed automatically in Ecto when you use the `references/2` function.
 For other commonly used columns that need to be sorted, lookup fields and columns that are used with GROUP BY it's a good
-idea to add indexes.
+idea to add indexes by using the `index/3` function.
 
 Let's change our migration script to illustrate this:
 
-{% highlight ruby %}
-class CreateProducts < ActiveRecord::Migration
-  def change
-    create_table :products do |t|
-      t.string :name
-     	t.belongs_to :category
+{% highlight elixir %}
+defmodule EctoIndex.Repo.Migrations.AddTables do
+  use Ecto.Migration
+
+  def change do
+    create table(:groups) do
+      add :name, :string
     end
 
-    create_table :categories do |t|
-      t.string :name
+    create table(:users) do
+      add :full_name, :string
+      add :dob, :date
+      add :group_id, references(:groups)
     end
 
-    add_index :products, :category_id
+    create index(:users, [:dob])
   end
 end
+
 {% endhighlight %}
 
 And after adding the migration above you should see this in psql:
 
 {% highlight sql %}
 
-indexes_development=# indexes_development=# \d products
-                                   Table "public.products"
-   Column    |          Type          |                       Modifiers
--------------+------------------------+-------------------------------------------------------
- id          | integer                | not null default nextval('products_id_seq'::regclass)
- name        | character varying(255) |
- category_id | integer                |
+ecto_index=# \d users
+                                  Table "public.users"
+  Column   |          Type          |                     Modifiers
+-----------+------------------------+----------------------------------------------------
+ id        | integer                | not null default nextval('users_id_seq'::regclass)
+ full_name | character varying(255) |
+ dob       | date                   |
+ group_id  | integer                |
 Indexes:
-    "products_pkey" PRIMARY KEY, btree (id)
-    "index_products_on_category_id" btree (category_id)
-
+    "users_pkey" PRIMARY KEY, btree (id)
+    "users_dob_index" btree (dob)
+Foreign-key constraints:
+    "users_group_id_fkey" FOREIGN KEY (group_id) REFERENCES groups(id)
 {% endhighlight %}
 
-Notice that we now have an index called `index_products_on_category_id` for the category_id. So that extra `add_index` line in the migration will make your application perform a lot better.
+Notice that we now have an index called `users_dob_index` for the dob column. So that extra call to the `index/3` function
+creates an index using btree for us. Also notice that now have a foreign constraint added as well. This index/constraint
+is created when use the `references/2` function when adding columns to out table.
 
 #### Unique Indexes
 
