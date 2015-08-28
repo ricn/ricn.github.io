@@ -103,7 +103,6 @@ Unique indexes are typical for things like username or email that's used to logi
 
 This is how you create a unique index with Ecto:
 
-To avoid this you need to create a unique constraint at the database level as well:
 {% highlight elixir %}
 defmodule EctoIndex.Repo.Migrations.AddTables do
   use Ecto.Migration
@@ -131,7 +130,7 @@ Indexes:
     "users_email_index" UNIQUE, btree (email)
 {% endhighlight %}
 
-So by creating the `users_email_index` unique index you get some very nice benefits. Data integrity and good performance because unique indexes tends to be very fast. You also get the possibility to use the `unique_constraint/3` function in changesets:
+So by creating the `users_email_index` unique index you get some very nice benefits like data integrity and good performance because unique indexes tends to be very fast. You also get the possibility to use the `unique_constraint/3` function in changesets:
 
 {% highlight sql %}
 	cast(user, params, ~w(email), ~w())
@@ -144,33 +143,47 @@ The validation function works by relying on the database to check if the unique 
 
 By default, the entries in a B-tree index is sorted in ascending order. However, in some particular cases it can be a good idea to use a descending order for the index instead.
 
-One of the most obvious case is when you have something that is paginated and all the items are sorted by the most recent released first. For example a blog post model that has a released_at column. For unreleased blog posts, the released_at value is NULL.
+One of the most obvious case is when you have something that is paginated and all the items are sorted by the most recent created first. For example a blog post model that has a released_at column. For unreleased blog posts, the released_at value is NULL.
 
 This is how you create this kind of index:
 
-{% highlight ruby %}
-class CreatePosts < ActiveRecord::Migration
-  def change
-    create_table :posts do |t|
-      t.string :title
-      t.datetime :released_at
+{% highlight elixir %}
+defmodule EctoIndex.Repo.Migrations.AddTables do
+  use Ecto.Migration
 
-      t.timestamps
+  def change do
+    create table(:posts) do
+      add :title, :string
+      add :released_at, :datetime
     end
 
-    add_index :posts, :released_at, order: { released_at: "DESC NULLS LAST" }
+    create index(:posts, ["released_at DESC NULLS LAST"])
   end
 end
 {% endhighlight %}
 
-As we're going to query the table in sorted order by released_at and limiting the result, we may have some benefit by creating an index in that order.
-PostgreSQL will find the rows it needs from the index in the correct order, and then go to the data blocks to retrieve the data. If the index wasn't sorted, there's a good chance that PostgreSQL would read the data blocks sequentially and then sort the results.
+In psql:
+
+{% highlight sql %}
+ecto_index=# \d posts
+                                      Table "public.posts"
+   Column    |            Type             |                     Modifiers
+-------------+-----------------------------+----------------------------------------------------
+ id          | integer                     | not null default nextval('posts_id_seq'::regclass)
+ title       | character varying(255)      |
+ released_at | timestamp without time zone |
+Indexes:
+    "posts_pkey" PRIMARY KEY, btree (id)
+    "posts_released_at_DESC_NULLS_LAST_index" btree (released_at DESC NULLS LAST)
+{% endhighlight %}
+
+As we're going to query the table in sorted order by released_at and limiting the result, we may have some benefit by creating an index in that order. PostgreSQL will find the rows it needs from the index in the correct order, and then go to the data blocks to retrieve the data. If the index wasn't sorted, there's a good chance that PostgreSQL would read the data blocks sequentially and then sort the results.
 
 This technique is mostly relevant with single column indexes when you require nulls to be last. Otherwise the order is already there because an index can be scanned in any direction.
 
 #### Partial Indexes
 
-If you frequently filter your queries by a particular column value, and that column value is present in a minority of your rows, partial indexes may increase your performance significantly.  A partial index is basically an index using a `WHERE` clause. It increases the efficiency of the index by reducing its size which makes the index smaller and takes less storage, is easier to maintain, and is faster to scan.
+If you frequently filter your queries by a particular column value, and that column value is present in a minority of your rows, partial indexes may increase your performance significantly. A partial index is basically an index using a `WHERE` clause. It increases the efficiency of the index by reducing its size which makes the index smaller and takes less storage, is easier to maintain, and is faster to scan.
 
 Let's say that you have a table for orders. That table can contain both billed and unbilled orders, where the unbilled orders take up a minority of the total rows in the table. It's very likely that the unbilled orders are also the most accessed rows in your application. Then it is very likely that your application performance will increase if you use an partial index.
 
