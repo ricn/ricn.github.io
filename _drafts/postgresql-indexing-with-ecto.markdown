@@ -133,12 +133,11 @@ Indexes:
 
 So by creating the `users_email_index` unique index you get some very nice benefits like data integrity and good performance because unique indexes tends to be very fast. You also get the possibility to use the `unique_constraint/3` function in changesets:
 
-{% highlight sql %}
-	cast(user, params, ~w(email), ~w())
-	|> unique_constraint(:email)
+{% highlight elixir %}
+	cast(user, params, ~w(email), ~w()) |> unique_constraint(:email)
 {% endhighlight %}
 
-The validation function works by relying on the database to check if the unique constraint has been violated or not and, if so, Ecto converts it into a changeset error.
+The validation function relies on the database to check if the unique constraint has been violated or not and, if so, Ecto converts it into a changeset error which is much nicer to present to the end user.
 
 #### Sorted Indexes
 
