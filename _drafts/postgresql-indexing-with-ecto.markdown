@@ -188,17 +188,16 @@ If you frequently filter your queries by a particular column value, and that col
 Let's say that you have a table for orders. That table can contain both billed and unbilled orders, where the unbilled orders take up a minority of the total rows in the table. It's very likely that the unbilled orders are also the most accessed rows in your application. Then it is very likely that your application performance will increase if you use an partial index.
 
 Example:
-{% highlight ruby %}
-class CreateOrders < ActiveRecord::Migration
-  def change
-    create_table :orders do |t|
-      t.float :amount
-      t.boolean :billed, default: false
+{% highlight elixir %}
+defmodule EctoIndex.Repo.Migrations.AddTables do
+  use Ecto.Migration
 
-      t.timestamps
+  def change do
+    create table(:orders) do
+      add :billed, :boolean, default: false
     end
 
-    add_index :orders, :billed, where: "billed = false"
+    execute("CREATE INDEX index_orders_on_billed_idx ON orders(billed) WHERE billed = false")
   end
 end
 {% endhighlight %}
@@ -206,16 +205,16 @@ end
 This is how it looks in psql:
 
 {% highlight sql %}
-indexes_development-# \d orders
-                                     Table "public.orders"
-   Column   |            Type             |                      Modifiers
-------------+-----------------------------+-----------------------------------------------------
- id         | integer                     | not null default nextval('orders_id_seq'::regclass)
- amount     | double precision            |
- billed     | boolean                     | default false
- created_at | timestamp without time zone |
- updated_at | timestamp without time zone |
+ecto_index=# \d orders
+                         Table "public.orders"
+ Column |  Type   |                      Modifiers
+--------+---------+-----------------------------------------------------
+ id     | integer | not null default nextval('orders_id_seq'::regclass)
+ billed | boolean | default false
 Indexes:
     "orders_pkey" PRIMARY KEY, btree (id)
-    "index_orders_on_billed" btree (billed) WHERE billed = false
+    "index_orders_on_billed_idx" btree (billed) WHERE billed = false
 {% endhighlight %}
+
+Ecto does not have any nice feature to define partial indexes yet so we have to rely on the `execute/1` function and send
+the raw command to PostgreSQL. I have created an [issue on Github](https://github.com/elixir-lang/ecto/issues/883) for this and it's currently being discussed. 
