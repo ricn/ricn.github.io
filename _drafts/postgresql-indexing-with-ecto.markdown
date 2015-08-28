@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "PostgreSQL indexing with Ecto"
-date:   2015-08-18 08:00:00
+date:   2015-08-28 08:00:00
 categories: elixir ecto postgresql
 ---
 <p class="lead">
@@ -10,14 +10,15 @@ categories: elixir ecto postgresql
 
 The purpose of indexes is to make access to data faster. Most of the time an index will make your queries faster but the trade off is that for each index you have your data insertion will become slower. That's because when you insert data with an index it must write data to two different places.
 
-PostgreSQL has many types of options when it comes to indexing. We will focus on the [B-tree](http://en.wikipedia.org/wiki/B-tree) index type which is the most commonly used index type for most use cases but we will can a look at the GIN (Generalized Inverted Index) index type
-as well for indexing JSON columns.
+PostgreSQL has many types of options when it comes to indexing. We will focus on the [B-tree](http://en.wikipedia.org/wiki/B-tree) index type which is the most commonly used index type for most use cases.
 
 You should be familiar with [Ecto](https://github.com/elixir-lang/ecto) and know how to work with [migrations](http://hexdocs.pm/ecto/Ecto.Migration.html) to follow this blog post.
 
 #### Primary key indexes
 
-Ok, let's start with the basics. In general it's a good practice to add an index for the primary key in your tables. If your table will have a large number of rows it makes good use of an index and the lookup will take place in the index instead of sequentially scan your table for the matching rows. Luckily, PostgreSQL automatically creates an index for primary keys to enforce uniqueness. Thus, it is not necessary to create an index explicitly for primary key columns:
+Ok, let's start with the basics. In general it's a good practice to add an index for the primary key in your tables. If your table will have a large number of rows it makes good use of an index and the lookup will take place in the index instead of sequentially scan your table for the matching rows. Luckily, PostgreSQL automatically creates an index for primary keys to enforce uniqueness. Thus, it is not necessary to create an index explicitly for primary key columns.
+
+Let's create a basic table:
 
 {% highlight elixir %}
 defmodule EctoIndex.Repo.Migrations.AddTables do
@@ -44,11 +45,11 @@ Indexes:
     "users_pkey" PRIMARY KEY, btree (id)
 {% endhighlight %}
 
-As you can see, you now have an primary key index using the btree type to index the id column.
+As you can see, you now have a primary key index using the btree type to index the id column.
 
 #### Foreign keys and other commonly used columns
 
-Unlike primary keys, foreign keys and other columns in your table will not be indexed automatically in PostgreSQL. So it’s always a good idea to add indexes for foreign keys, columns that need to be sorted, lookup fields and columns that are used with GROUP BY.
+Unlike primary keys, foreign keys and other columns in your table will not be indexed automatically in PostgreSQL. So it’s always a good idea to add indexes for foreign keys, columns that need to be sorted, lookup fields and columns that are used with `GROUP BY`.
 
 Luckily it’s very easy to add them. Let's change our migration script to illustrate this:
 
@@ -217,4 +218,4 @@ Indexes:
 {% endhighlight %}
 
 Ecto does not have any nice feature to define partial indexes yet so we have to rely on the `execute/1` function and send
-the raw command to PostgreSQL. I have created an [issue on Github](https://github.com/elixir-lang/ecto/issues/883) for this and it's currently being discussed. 
+the raw command to PostgreSQL. I have created an [issue on Github](https://github.com/elixir-lang/ecto/issues/883) for this and it's currently being discussed.
