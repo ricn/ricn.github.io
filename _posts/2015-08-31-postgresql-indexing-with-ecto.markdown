@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "PostgreSQL indexing with Ecto"
-date:   2015-08-28 08:00:00
+date:   2015-08-31 08:00:00
 categories: elixir ecto postgresql
 ---
 <p class="lead">
