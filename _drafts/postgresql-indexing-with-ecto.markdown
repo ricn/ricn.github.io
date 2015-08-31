@@ -68,7 +68,7 @@ defmodule EctoIndex.Repo.Migrations.AddTables do
       add :group_id, references(:groups)
     end
 
-		create index(:users, [:group_id])
+    create index(:users, [:group_id])
     create index(:users, [:dob])
   end
 end
@@ -217,4 +217,4 @@ Indexes:
 {% endhighlight %}
 
 Ecto does not have any nice feature to define partial indexes yet so we have to rely on the `execute/1` function and send
-the raw command to PostgreSQL. I have created an [issue on Github](https://github.com/elixir-lang/ecto/issues/883) for this and it's currently being discussed and hopefully fixed soon.
+the raw command to PostgreSQL. I have created an [issue on Github](https://github.com/elixir-lang/ecto/issues/883) for this and it's currently being discussed and hopefully we can have some nice syntax for defining partial indexes in Ecto soon.
