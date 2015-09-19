@@ -89,8 +89,42 @@ $(function () {
 });
 {% endhighlight %}
 
-This means that all a-tags within the #pjax-container will be loaded used as a pjax-link and load the url content using
+This means that all a tags within the #pjax-container will be loaded used as a pjax-link and load the url content using
 ajax.
 
-Now, we are getting closer to a complete solution. But we still needs to tell the server to not render & send the layout
+Now, we are getting closer to a complete solution. But we still needs to tell the server to not render and send the layout
 to the client. This can easily be done by creating a custom plug in Phoenix:
+
+{% highlight elixir %}
+## web/plugs/pjax.ex
+defmodule Pjax.Plugs.Pjax do
+  import Plug.Conn
+  use Phoenix.Controller
+
+  def init(default), do: default
+
+  def call(conn, default) do
+    use_pjax? = Enum.any?(conn.req_headers, fn(x) -> {"x-pjax", "true"} == x end)
+    if use_pjax?, do: conn |> put_layout(false), else: conn
+  end
+end
+{% endhighlight %}
+
+This simple plug just looks for the x-pjax request header that will be added by the jquery plugin when we click on a link.
+If that header is present we tell Phoenix to not use any layout, otherwise we just return the conn as is.
+
+The last thing we need to do is to add the plug to our browser stack:
+
+{% highlight elixir %}
+## web/router.ex
+...
+pipeline :browser do
+  plug :accepts, ["html"]
+  plug :fetch_session
+  plug :fetch_flash
+  plug :protect_from_forgery
+  plug :put_secure_browser_headers
+  plug Pjax.Plugs.Pjax
+end
+...
+{% endhighlight %}
