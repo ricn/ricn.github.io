@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Develop blazing fast web apps in Phoenix using pjax"
+title: "Develop fast web apps in Phoenix using pjax"
 date:   2015-09-20 08:00:00
 categories: elixir phoenix
 ---
