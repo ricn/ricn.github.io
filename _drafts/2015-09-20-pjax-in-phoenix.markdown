@@ -19,7 +19,7 @@ In this article I'm going to show you how you can add pjax to the Phoenix framew
 
 ##### Setup
 
-Let's setup a new Phoenix project that we can use to demonstrate PJAX in Phoenix:
+Let's setup a new Phoenix project that we can use to demonstrate pjax in Phoenix:
 
 {% highlight bash %}
 mix phoenix.new pjax
@@ -91,7 +91,7 @@ $(function () {
 This means that all a tags within the #pjax-container will be loaded used as a pjax-link and load the url content using
 ajax.
 
-Now, we are getting closer to a complete solution. But we still needs to tell the server to not render and send the layout
+Now, we are getting closer to a complete solution. But we still need to tell the server to not render and send the layout
 to the client. This can easily be done by creating a custom plug in Phoenix:
 
 {% highlight elixir %}
@@ -109,8 +109,8 @@ defmodule Pjax.Plugs.Pjax do
 end
 {% endhighlight %}
 
-This simple plug just looks for the x-pjax request header that will be added by the jquery plugin when we click on a link.
-If that header is present we tell Phoenix to not use any layout, otherwise we just return the conn as is.
+This simple plug just looks for the x-pjax request header that will be added by the jQuery plugin when we click on a link.
+If the header is present we tell Phoenix to not use any layout by using `put_layout(false)`, otherwise we just return the conn as is.
 
 The last thing we need to do is to add the plug to our browser stack:
 
@@ -127,3 +127,16 @@ pipeline :browser do
 end
 ...
 {% endhighlight %}
+
+Don't forget to restart your server.
+
+##### Test your new web application with pjax
+
+Now when you click around in your application you should notice that the logo is not flickering anymore and the overall experience is that application is a whole lot faster. If I look in my log file I can now see that it takes ~700µs to to render /users/new with pjax enabled. That's 300 µs faster than without pjax. That's not so much of an improvement.
+
+However, when I look in the Chrome console it only takes ~30ms to handle the AJAX request and to render the HTML fragment. That's a significant improvement in my opinion.
+
+##### Conclusion
+
+One of the biggest advantage with pjax is simplicity in my mind. I like full client-side frameworks like AnguarJS and React but sometimes it's just
+too complicated. The pjax approach allows you to use the good ol' server side rendering you are familiar with while still getting great client-side performance. As with most design choices, there are trade-offs. This approach isn't for every app, but it is a great tool to have available and use when appropriate.
