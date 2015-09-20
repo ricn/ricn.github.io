@@ -1,21 +1,21 @@
 ---
 layout: post
-title: "Develop blazing fast web apps in Phoenix using PJAX"
+title: "Develop blazing fast web apps in Phoenix using pjax"
 date:   2015-09-20 08:00:00
 categories: elixir phoenix
 ---
-<p class="lead">
-  Turbolinks for Phoenix [trollface]
-</p>
 
-Frameworks and libraries like [AngularJS](https://angularjs.org/), [Ember](http://emberjs.com/) and [React](https://facebook.github.io/react/) are very popular choices for modern frontend development. While
-they are great for building complex user interfaces they also adds extra complexity to your web application.
+##### Introduction
 
-The old school alternative is to just use pure server-side frameworks that spits out all the HTML on each request.
+Frameworks and libraries like [AngularJS](https://angularjs.org/), [Ember](http://emberjs.com/) and [React](https://facebook.github.io/react/) are very popular choices for modern frontend development today. While they are great for building complex user interfaces they also adds extra complexity to your web application.
+
+The old school alternative is to just use pure server-side rendering that spits out all the HTML on each request.
 This approach is very simple to reason about while you develop your web application because you just have to send all HTML
-that needs to be displayed in the web browser. Although response times in [Phoenix](http://www.phoenixframework.org/) are often measured in microseconds instead of milliseconds it will take some time for the browser to render all the HTML over and over again and if you have a logo in the header you will see it flickering.
+that needs to be displayed in the web browser all the time. Although response times in [Phoenix](http://www.phoenixframework.org/) are often measured in microseconds instead of milliseconds it will take some time for the browser to render all the HTML over and over again and if you have a logo in the header you will see it flickering.
 
-[PJAX](https://github.com/defunkt/jquery-pjax) is a [jQuery](https://jquery.com/) plugin, written by [Chris Wanstrath]() that puts itself somewhere between client side and server side rendering of HTML. The idea behind PJAX is that you update only the parts of the page that change when the user navigates through your app. However, unlike a normal AJAX app that returns only data (JSON) from the server, a PJAX request actually contains normal HTML that has been generated on the server. This HTML is only a fragment of the full page and using Javascript on the client this fragment is substituted in for the last page's content.
+[Pjax](https://github.com/defunkt/jquery-pjax) is a [jQuery](https://jquery.com/) plugin, written by [Chris Wanstrath]() that puts itself somewhere between client side and server side rendering of HTML. The idea behind pjax is that you update only the parts of the page that change when the user navigates through your app. However, unlike a normal AJAX app that returns only JSON from the server, a pjax request actually contains normal HTML that has been generated on the server. This HTML is only a fragment of the full page and Javascript is used in the browser to add the content to the page.
+
+In this article I'm going to show you how you can add pjax to the Phoenix framework.
 
 ##### Setup
 
@@ -40,18 +40,17 @@ mix phoenix.server
 
 You should now have a simple crud app up and running in Phoenix. Point your browser at http://localhost:4000/users.
 
-##### Test your new web application
+##### Test your new web application without pjax
 
-If you click around in your new application you will probably notice that the Phoenix logo is flickering. Also, look in your log file and remember how long time it takes for Phoenix to send a 200 OK for the HTML. On my old Macbook Air i7 from 2012 it takes 1ms to render /users/new without PJAX. That's of course already ridicoulsy fast for running the Phoenix server in developement mode. Once I enable PJAX in the application, Phoenix responds in ~700µs instead.
+If you click around in your new application you will probably notice that the Phoenix logo is flickering. Also, look in your log file and remember how long time it takes for Phoenix to send a 200 OK for the HTML. On my old Macbook Air i7 from 2012 it takes ~1ms to render /users/new without pjax. That's of course already ridiculously fast for running the Phoenix server in developement mode. When I look in the Chrome console it takes around
+300ms to load everything when I visit /users/new. We will compare this with pjax enabled later in the article.
 
-Around 300ms to load everything
-30 ms with PJAX in Chrome.
+##### Implement pjax in your new web application
 
-##### Implement PJAX in your new web application
-
-PJAX is not fully automatic. You'll need to setup and choose a containing element on your page that will be replaced when you click on links in your web application.
+Pjax is not fully automatic. You'll need to setup and choose a containing element on your page that will be replaced when you click on links in your web application.
 
 First we need to change our layout file:
+
 {% highlight erb %}
 ## web/templates/layout/app.html.eex
 ...
@@ -76,9 +75,9 @@ First we need to change our layout file:
 ...
 {% endhighlight %}
 
-You only see the body part of the layout above. Notice that we have added a div with id pjax-container. We want PJAX to grab the URLs that will be rendered in @inner then replace #pjax-container with whatever it gets back. No styles or scripts will be reloaded. Also notice that we have added links to jQuery and the PJAX library at the bottom of the body.
+You only see the body part of the layout above. The rest is omitted to save space. Notice that we have added a div with id pjax-container. We want pjax to grab the URLs that will be rendered in @inner then replace #pjax-container with whatever it gets back from the serve. No styles or scripts will be reloaded. Also notice that we have added links to jQuery and the pjax library at the bottom of the body.
 
-Next we need to initialize PJAX when you hit the web app for the first time:
+Next we need to initialize pjax when the user hit the web app for the first time:
 
 {% highlight javascript %}
 // web/static/js/app.js
