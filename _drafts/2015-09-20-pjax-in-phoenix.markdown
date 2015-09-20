@@ -75,20 +75,20 @@ First we need to change our layout file:
 ...
 {% endhighlight %}
 
-You only see the body part of the layout above. The rest is omitted to save space. Notice that we have added a div with id pjax-container. We want pjax to grab the URLs that will be rendered in @inner then replace #pjax-container with whatever it gets back from the serve. No styles or scripts will be reloaded. Also notice that we have added links to jQuery and the pjax library at the bottom of the body.
+You only see the body part of the layout above. The rest is omitted to save space. Notice that we have added a div with id pjax-container. We want pjax to grab the URLs that will be rendered in `@inner` then replace `#pjax-container` with whatever it gets back from the server. No styles or scripts will be reloaded. Also notice that we have added links to jQuery and the pjax library at the bottom of the body.
 
 Next we need to initialize pjax when the user hit the web app for the first time:
 
 {% highlight javascript %}
 // web/static/js/app.js
-import "deps/phoenix_html/web/static/js/phoenix_html"
+...
 
 $(function () {
   $(document).pjax("a", "#pjax-container");
 });
 {% endhighlight %}
 
-This means that all a tags within the #pjax-container will be loaded used as a pjax-link and load the url content using
+This means that all a tags within the #pjax-container will be used as a pjax-link and load the url content using
 ajax.
 
 Now, we are getting closer to a complete solution. But we still need to tell the server to not render and send the layout
@@ -110,9 +110,9 @@ end
 {% endhighlight %}
 
 This simple plug just looks for the x-pjax request header that will be added by the jQuery plugin when we click on a link.
-If the header is present we tell Phoenix to not use any layout by using `put_layout(false)`, otherwise we just return the conn as is.
+If the header is present we tell Phoenix to not put any layout by using `put_layout(false)`. Otherwise we just return the conn as is.
 
-The last thing we need to do is to add the plug to our browser stack:
+The last thing we need to do is to add the plug to the browser stack:
 
 {% highlight elixir %}
 ## web/router.ex
@@ -134,7 +134,7 @@ Don't forget to restart your server.
 
 Now when you click around in your application you should notice that the logo is not flickering anymore and the overall experience is that application is a whole lot faster. If I look in my log file I can now see that it takes ~700µs to to render /users/new with pjax enabled. That's 300 µs faster than without pjax. That's not so much of an improvement.
 
-However, when I look in the Chrome console it only takes ~30ms to handle the AJAX request and to render the HTML fragment. That's a significant improvement in my opinion.
+However, when I look in the Chrome console it only takes ~30ms to handle the AJAX request and to render the HTML fragment. That's a significant improvement in my opinion (compared to ~300ms).
 
 ##### Conclusion
 
