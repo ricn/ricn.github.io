@@ -12,14 +12,14 @@ In this article I'm going to show you how you can authenticate and synchronize u
 
 ##### Setup Phoenix
 
-Let's setup a new Phoenix project and a user model that we can use to demonstrate LDAP authentication in Phoenix:
+Let's setup a new Phoenix project and a user model that we can use to demonstrate LDAP authentication / synchronization in Phoenix:
 
 {% highlight bash %}
 mix phoenix.new ldap_example
 ...
 Fetch and install dependencies? [Yn] Y
 
-cd ldap
+cd ldap_example
 
 mix ecto.create (configure your db in config/dev.exs if needed)
 
@@ -31,7 +31,7 @@ mix ecto.migrate
 
 ##### Setup Guardian
 
-To manage the authentication process I'm going to use [Guardian](https://hex.pm/packages/guardian) which is one of the most popular authentication framework for use with Elixir. This article is not about Guardian so I'm not going to explain in detail what the code below does. If you're new to Guardian and want to know more you should read the documentation for Guardian.
+To manage the authentication process I'm going to use [Guardian](https://hex.pm/packages/guardian) which is one of the most popular authentication framework for use with Elixir. This article is not about Guardian so I'm not going to explain in detail what the code below does. If you're new to Guardian and want to know more you should read the [documentation](https://hex.pm/packages/guardian) for Guardian.
 
 mix.exs:
 {% highlight elixir %}
@@ -121,7 +121,7 @@ To connect to an LDAP server and authenticate users I'm going to use the [Exldap
 mix.exs:
 {% highlight elixir %}
 def deps do
-  [{:exldap, "~> 0.2"}]
+  [{:exldap, "~> 0.3.4"}]
 end
 {% endhighlight %}
 
@@ -250,6 +250,8 @@ The interesting parts in the Session controller happens in the `create`, `handle
 deals with all the details and determines if we need to insert the user (first time sign in) or just update it. The user will only be updated if the attributes in LDAP differs from the attributes in our
 local user table.
 
+The user model need to be updated with a virtual field for the password and a special `login_changeset` that we use in the sign in form.
+
 web/model/user.ex:
 {% highlight elixir %}
 defmodule LdapExample.User do
@@ -274,8 +276,7 @@ defmodule LdapExample.User do
   end
 end
 {% endhighlight %}
-The user model has just been updated with a virtual field for password and a special login_changeset
-that we use in the sign in form.
+
 
 web/templates/session/new.html.eex:
 {% highlight erb %}
@@ -297,7 +298,7 @@ web/templates/session/new.html.eex:
 <% end %>
 {% endhighlight %}
 
-web/view/session_view.ex:
+web/views/session_view.ex:
 {% highlight elixir %}
 defmodule LdapExample.SessionView do
   use LdapExample.Web, :view
