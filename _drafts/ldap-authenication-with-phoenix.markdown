@@ -116,7 +116,7 @@ you can run `mix phoenix.server` and point your browser at [http://localhost:400
 
 ##### Setup Exldap
 
-To connect to an LDAP server and authenticate users I'm going to use the [Exldap](https://hex.pm/packages/exldap) library. Exldap is basically a thin wrapper for the [eldap](http://erlang.org/doc/man/eldap.html) module in Erlang. To make everything a little bit easier we're also going to use a public LDAP server with demo users from [Forumsystems](http://www.forumsys.com/en/tutorials/integration-how-to/ldap/online-ldap-test-server/) so we don't have to spend time setting up our own LDAP server for testing.
+To connect to a LDAP server and authenticate users I'm going to use the [Exldap](https://hex.pm/packages/exldap) library. Exldap is basically a thin wrapper for the [eldap](http://erlang.org/doc/man/eldap.html) module in Erlang. To make everything a little bit easier we're also going to use a public LDAP server with demo users from [Forumsystems](http://www.forumsys.com/en/tutorials/integration-how-to/ldap/online-ldap-test-server/) so we don't have to spend time setting up our own LDAP server for testing.
 
 mix.exs:
 {% highlight elixir %}
@@ -245,9 +245,7 @@ defmodule LdapExample.SessionController do
 end
 {% endhighlight %}
 
-The interesting parts in the Session controller happens in the `create`, `handle_sign_in` and `insert_or_update` function. In the `create` function we just authenticate the user with username / password using our own Ldap module. If the user is authenticated in LDAP we continue to the
-`handle_sign_in` function and calls the `insert_or_update` function. That function just gets the user attributes from LDAP and creates a map that we can use when we create an Ecto changeset. The changeset
-deals with all the details and determines if we need to insert the user (first time sign in) or just update it. The user will only be updated if the attributes in LDAP differs from the attributes in our
+The interesting parts in SessionController happens in the `create`, `handle_sign_in` and `insert_or_update` functions. In the `create` function we just authenticate the user with username / password using our own Ldap module. If the user is authenticated in LDAP we continue to the `handle_sign_in` function and calls the `insert_or_update_user` function. That function just gets the user attributes from LDAP and creates a map that we can use when we create an Ecto changeset. The changeset deals with all the details and determines if we need to insert the user (first time sign in) or just update it. The user will only be updated if the attributes in LDAP differs from the attributes in our
 local user table.
 
 The user model need to be updated with a virtual field for the password and a special `login_changeset` that we use in the sign in form.
@@ -314,7 +312,7 @@ get "/sign_out", SessionController, :delete
 ...
 {% endhighlight %}
 
-And finally we need to add our Session controller to the router. Now you can try to start your Phoenix application and point your browser to [http://localhost:4000/sign_in](http://localhost:4000/sign_in) and try to login with einstein / password. You should now see the default Phoenix page and a message saying that you're logged in. To sign out again you can just point your browser to [http://localhost:4000/sign_out](http://localhost:4000/sign_out) and
+And finally we need to add our SessionController to the router. Now you can try to start your Phoenix application and point your browser at [http://localhost:4000/sign_in](http://localhost:4000/sign_in) and try to login with einstein / password. You should now see the default Phoenix page and a message saying that you're logged in. To sign out again you can just point your browser at [http://localhost:4000/sign_out](http://localhost:4000/sign_out) and
 you should see the Unauthenticated message again.
 
 ##### Conclusion
