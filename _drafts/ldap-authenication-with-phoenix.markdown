@@ -317,7 +317,7 @@ you should see the Unauthenticated message again.
 
 ##### Conclusion
 
-Implementing LDAP authentication and synchronization with Elixir / Phoenix was much more straight forward than I thought. The library support is already in place thanks to Guardian and Exldap and if you want dig deeper and implement more advanced things you can always fall back to the eldap library in Erlang which seems to have virtually everything you need to work with LDAP.
+Implementing LDAP authentication and synchronization with Elixir / Phoenix was much more straight forward than I thought. The library support is already in place thanks to [Guardian](https://hex.pm/packages/guardian) and [Exldap](https://hex.pm/packages/exldap) and if you want dig deeper and implement more advanced things you can always fall back to the [eldap](http://erlang.org/doc/man/eldap.html) module in Erlang which seems to have virtually everything you need to work with LDAP.
 
 It also worth mentioning that there are another LDAP library in Elixir which integrates nicely with Ecto called [EctoLdap](https://hex.pm/packages/ecto_ldap).
 
