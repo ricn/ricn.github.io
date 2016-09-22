@@ -6,7 +6,7 @@ categories: elixir phoenix ldap
 
 ##### Introduction
 
-[LDAP](https://en.wikipedia.org/wiki/Lightweight_Directory_Access_Protocol) is mostly used by medium-to-large organi­zations to have one centralized place to store users and groups and to allow others internal systems to authenticate the users. If you want to build [Phoenix](http://http://www.phoenixframework.org/) applications that will work within an enterprise you will likely have to integrate with an existing LDAP server.
+[LDAP](https://en.wikipedia.org/wiki/Lightweight_Directory_Access_Protocol) is mostly used by medium-to-large organi­zations to have one centralized place to store users and groups and to allow others internal systems to authenticate the users. If you want to build [Phoenix](http://www.phoenixframework.org/) applications that will work within an enterprise you will likely have to integrate with an existing LDAP server.
 
 In this article I'm going to show you how you can authenticate and synchronize users to your Phoenix application.
 
