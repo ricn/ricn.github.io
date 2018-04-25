@@ -42,3 +42,37 @@ ul {
 a {
   color: #00866c;
 }
+
+.highlight .nb {
+  color: #0079a2;
+}
+
+.highlight .no {
+  color: #007d7d;
+}
+
+.highlight .c1 {
+  color: #717160;
+  font-style: italic;
+}
+
+.highlight .m {
+  color: #007d7d;
+}
+
+.highlight .nv {
+  color: #007d7d;
+}
+
+pre {
+  background-color: #fefefe;
+}
+
+.highlight .bp {
+  color: #767676;
+}
+
+.highlight .cp {
+  color: #767676;
+  font-weight: bold;
+}
