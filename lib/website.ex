@@ -3,7 +3,7 @@ defmodule Website do
   import Phoenix.HTML
   alias Website.Blog
 
-  @output_dir "./output"
+  @output_dir "./docs"
   File.mkdir_p!(@output_dir)
 
   def build() do
